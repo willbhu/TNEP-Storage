@@ -1,0 +1,142 @@
+"""
+plot_integrated_load.py
+
+Geographical plot of total load integrated over 24 hours per bus, for one
+representative day. Circle size and color intensity reflect the total MWh
+consumed at each bus over the day -- showing where demand is geographically
+concentrated across the Texas grid.
+
+USAGE:
+    cd viz/tamu/topology
+    python plot_integrated_load.py examples/example_simdir [rep_index]
+
+    rep_index defaults to 1 (first representative day).
+    For the full 18-day config, Aug 11 is rep_index=13.
+
+OUTPUT:
+    simdir/integrated_load_geo.html  -- interactive Plotly map
+"""
+
+import json
+import sys
+import numpy as np
+import plotly.graph_objects as go
+
+# ── Args ──────────────────────────────────────────────────────────────────────
+simdir    = sys.argv[1]
+rep_index = int(sys.argv[2]) if len(sys.argv) > 2 else 1
+rep_key   = str(rep_index)
+BASE_MW   = 100.0  # data.json is in per-unit; multiply by 100 to get MW
+
+# ── Load data ─────────────────────────────────────────────────────────────────
+with open(f"../../../{simdir}/data.json", "r") as f:
+    data = json.load(f)
+
+date_label = data["param"]["dates"][rep_index - 1]
+
+# ── Compute integrated load per bus (sum over 24 hours → MWh) ────────────────
+bus_records = []
+for bus_id, bus in data["bus"].items():
+    load_profile = bus["load"].get(rep_key, [])
+    # Sum across all hours: each value is p.u. power × 1 hour = p.u. energy
+    # Multiply by BASE_MW to convert to MWh
+    integrated_load_mwh = float(np.sum(load_profile)) * BASE_MW if len(load_profile) > 0 else 0.0
+
+    bus_records.append({
+        "bus_id":               bus_id,
+        "lat":                  bus["lat"],
+        "lon":                  bus["lon"],
+        "integrated_load_mwh":  integrated_load_mwh,
+    })
+
+# Only plot buses with nonzero load
+load_buses = [b for b in bus_records if b["integrated_load_mwh"] > 0]
+
+# ── Scale marker sizes and colors ─────────────────────────────────────────────
+load_values = np.array([b["integrated_load_mwh"] for b in load_buses])
+
+def scale_sizes(values, min_size=4, max_size=35):
+    arr = np.array(values, dtype=float)
+    if arr.max() == 0:
+        return [min_size] * len(arr)
+    return (min_size + (max_size - min_size) * arr / arr.max()).tolist()
+
+sizes = scale_sizes(load_values)
+
+# ── Build transmission lines ───────────────────────────────────────────────────
+line_traces = []
+for branch in data["branch"].values():
+    f_bus = data["bus"][str(branch["f_bus"])]
+    t_bus = data["bus"][str(branch["t_bus"])]
+    line_traces.append(go.Scattergeo(
+        lat=[f_bus["lat"], t_bus["lat"]],
+        lon=[f_bus["lon"], t_bus["lon"]],
+        mode="lines",
+        showlegend=False,
+        line=dict(color="darkgray", width=1.5),
+        hoverinfo="skip"
+    ))
+
+# ── Build figure ───────────────────────────────────────────────────────────────
+fig = go.Figure()
+
+# Transmission lines underneath
+fig.add_traces(line_traces)
+
+# Integrated load bubbles -- colored by intensity using a continuous colorscale
+fig.add_trace(go.Scattergeo(
+    lat=[b["lat"] for b in load_buses],
+    lon=[b["lon"] for b in load_buses],
+    mode="markers",
+    name="Daily Load (MWh)",
+    marker=dict(
+        size=sizes,
+        color=[b["integrated_load_mwh"] for b in load_buses],
+        colorscale="Reds",
+        colorbar=dict(
+            title=dict(text="Daily Load (MWh)"),
+            tickfont=dict(size=11),
+            x=0.92
+        ),
+        opacity=0.75,
+        line=dict(width=0.4, color="darkred"),
+        cmin=float(load_values.min()),
+        cmax=float(load_values.max()),
+        showscale=True
+    ),
+    text=[
+        f"Bus {b['bus_id']}<br>"
+        f"Daily load: {b['integrated_load_mwh']:.1f} MWh"
+        for b in load_buses
+    ],
+    hovertemplate="%{text}<extra></extra>"
+))
+
+fig.update_geos(
+    lonaxis_range=[-105, -94],
+    lataxis_range=[25.5, 36],
+    showland=True, showocean=True,
+    oceancolor="aliceblue", showlakes=True, lakecolor="aliceblue",
+    showcountries=True, countrycolor="gray",
+    showsubunits=True, subunitcolor="gray", subunitwidth=2
+)
+
+fig.update_layout(
+    title=dict(
+        text=f"24-Hour Integrated Load per Bus — {date_label}<br>"
+             f"<sup>Circle size and color = total MWh consumed over the day</sup>",
+        font=dict(size=18)
+    ),
+    margin=dict(l=0, r=0, t=60, b=0)
+)
+
+out_path = f"../../../{simdir}/integrated_load_geo.html"
+fig.write_html(out_path)
+print(f"Saved to {out_path}")
+
+# ── Print top 10 buses by load for a quick sanity check ──────────────────────
+print("\nTop 10 buses by integrated daily load:")
+top10 = sorted(load_buses, key=lambda b: b["integrated_load_mwh"], reverse=True)[:10]
+for b in top10:
+    print(f"  Bus {b['bus_id']:>4s}  {b['integrated_load_mwh']:>10.1f} MWh  "
+          f"  lat={b['lat']:.3f}  lon={b['lon']:.3f}")
