@@ -1,36 +1,53 @@
 """
 generate_scenarios.jl
 
-Generates multiple future grid scenarios for TEP+Storage planning with
-ZONE-SPECIFIC scaling of generation and load, replacing the previous
-statewide-uniform approach.
+Generates future grid scenarios for TEP+Storage planning using DIRECT
+FINAL RATIOS -- the number specified for each (scenario, zone, fuel, year)
+IS the ratio applied to the 2022 baseline. No EIA-baseline multiplication,
+no derived multipliers.
 
-Zone mapping (from power_system_data.json lat/lon):
-    301 → Far West    (Permian Basin, lon~-102) -- oil/gas industrial, high wind
-    302 → West        (Lubbock, lon~-101)       -- wind corridor
-    303 → West/North  (Abilene, lon~-100)       -- mixed
-    304 → South       (Corpus Christi, lon~-97) -- coastal industrial
-    305 → South Ctrl  (Waco/Austin, lon~-96.5)  -- general population
-    306 → South Ctrl  (San Antonio, lon~-98.6)  -- general population
-    307 → Coast       (Gulf Coast, lon~-96.5)   -- industrial + port
-    308 → North Ctrl  (DFW, lon~-96.1)          -- data centers + population
+═══════════════════════════════════════════════════════════════════════════════
+HOW THE SCALING WORKS (simple):
+═══════════════════════════════════════════════════════════════════════════════
 
-Sources:
-    Load multipliers: ERCOT 2025 Long-Term Load Forecast
-        https://www.ercot.com/gridinfo/load/forecast
-    Generation mix: EIA Annual Energy Outlook 2023
-        https://www.eia.gov/outlooks/aeo/
-    Renewable cost trajectories: NREL Annual Technology Baseline 2024
-        https://docs.nlr.gov/docs/fy24osti/89960.pdf
-        
-USAGE (from project root, in Julia REPL):
-    using CSV, DataFrames, TOML
+    final_capacity = ratio x baseline_2022_capacity
+
+    where `ratio` is read directly from the tables below.
+      ratio = 1.0  -> same as 2022
+      ratio = 2.0  -> double the 2022 capacity/load
+      ratio = 0.8  -> 80% of 2022 (retirement)
+
+    Each scenario has:
+      - a DEFAULT ratio per fuel per year (applied to all zones)
+      - optional PER-ZONE OVERRIDES for key zones (Far West, DFW, etc.)
+
+    The decarbonization CSV is used ONLY to read the 2022 baseline values.
+    update_decarbonization applies these ratios directly (see decarbonization.jl).
+
+ZONE MAP (from power_system_data.json):
+    301 Far West (Permian Basin)  -- oil/gas industrial, high wind
+    302 West (Lubbock)            -- wind corridor
+    303 West/North (Abilene)      -- rural, slow growth
+    304 South (Corpus Christi)    -- coastal industrial
+    305 South Central (Waco/Austin)
+    306 South Central (San Antonio)
+    307 Coast (Gulf Coast)        -- offshore wind
+    308 North Central (DFW)       -- data centers
+
+SCENARIOS:
+    A_low  = EIA AEO reference case (ratios ARE the EIA CSV projection)
+    B_med  = ERCOT adjusted forecast (data centers at 49.8% discount)
+    C_high = ERCOT TSP realistic-high (data centers, toned-down upper bound)
+
+SOURCES:
+    ERCOT 2025 LTDEF   https://www.ercot.com/files/docs/2025/04/08/ERCOT-2025-Long-Term-Load-Forecast-Report.pdf
+    ERCOT RPG          https://www.ercot.com/files/docs/2025/04/29/Long-term-Load-Forecast-RPG.pdf
+    EIA AEO 2023       https://www.eia.gov/outlooks/aeo/
+    NREL ATB 2024      https://atb.nrel.gov/electricity/2024/
+
+USAGE (from project root):
+    using CSV, DataFrames, TOML, JSON
     include("generate_scenarios.jl")
-
-OUTPUT:
-    scenarios/<scenario_name>/<year>/
-        config.toml
-        decarbonization_<scenario>_<year>.csv
 """
 
 using CSV
@@ -46,17 +63,15 @@ POWER_SYSTEM_DATA    = "data/topology/tamu/texas/power_system_data.json"
 OUTPUT_DIR           = "scenarios"
 PLANNING_YEARS       = [2030, 2035, 2040, 2045]
 
-# 18 representative days from meeting notes (Aug 11 = hardest day)
+# FAST TEST (1 day). Swap in the 18-day list below for real runs.
+#REPRESENTATIVE_DATES = ["2016-08-11"]
 REPRESENTATIVE_DATES = [
-    "2016-01-27", "2016-02-23", "2016-03-06", "2016-03-11",
-    "2016-03-22", "2016-03-27", "2016-04-03", "2016-04-22",
-    "2016-05-10", "2016-05-19", "2016-06-21", "2016-07-11",
-    "2016-08-11", "2016-09-02", "2016-09-10", "2016-11-16",
-    "2016-12-03", "2016-12-08"
-]
+      "2016-01-27","2016-02-23","2016-03-06","2016-03-11","2016-03-22","2016-03-27",
+      "2016-04-03","2016-04-22","2016-05-10","2016-05-19","2016-06-21","2016-07-11",
+      "2016-08-11","2016-09-02","2016-09-10","2016-11-16","2016-12-03","2016-12-08"]
 
-# ── Zone definitions ───────────────────────────────────────────────────────────
-# Maps zone_id → ERCOT weather zone name for documentation purposes
+USE_FAST_RUN = false
+
 ZONE_NAMES = Dict(
     301 => "Far West (Permian Basin)",
     302 => "West (Lubbock/Wind Corridor)",
@@ -68,331 +83,327 @@ ZONE_NAMES = Dict(
     308 => "North Central (DFW)",
 )
 
-# ── Scenario definitions ───────────────────────────────────────────────────────
+FUELS = ["load", "solar", "wind", "wind_offshore", "ng", "coal", "nuclear"]
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SCENARIO RATIOS  --  each number is the FINAL ratio vs 2022 baseline.
 #
-# Each scenario has:
-#   - statewide_multipliers: Dict(year => Dict(fuel_type => multiplier))
-#     Applied to ALL zones as a base. These come from EIA AEO reference case.
-#
-#   - zone_multipliers: Dict(year => Dict(zone_id => Dict(fuel_type => multiplier)))
-#     Applied ON TOP of statewide multipliers for specific zones.
-#     Final multiplier = statewide * zonal (multiplicative).
-#
-# This structure keeps the EIA baseline intact while allowing zones to
-# deviate based on ERCOT zonal forecasts and local resource quality.
-#
-# Sources for zonal load multipliers:
-#   - Zone 301 (Far West): ERCOT projects 11,964 MW oil/gas demand by 2030,
-#     +255% load growth last decade. Source: ERCOT LTLF 2025.
-#   - Zone 308 (DFW): Major data center concentration, high population growth.
-#     Source: ERCOT LTLF 2025, large load interconnection requests.
-#   - Zone 307 (Coast): Offshore wind opportunity, industrial port activity.
-#     Source: ERCOT GIS report, ERCOT LTLF 2025.
-#   - Zones 305/306 (South Central/Houston): Highest congestion prices,
-#     significant population and industrial growth.
-#     Source: ERCOT LTLF 2025.
-#
-# Sources for zonal generation multipliers:
-#   - Zones 301/302 (Far West/West): Dominant wind resource. New wind projects
-#     concentrated here per ERCOT GIS report.
-#   - Solar: Distributed across zones per existing capacity share.
-#     Source: ERCOT GIS report, NREL ATB 2024.
+# Structure:
+#   defaults[year][fuel]          -> ratio applied to ALL zones
+#   overrides[year][zone][fuel]   -> replaces the default for that zone/fuel
+# ═══════════════════════════════════════════════════════════════════════════════
 
 const SCENARIOS = [
 
-    # ── Scenario A: Low / EIA Reference ──────────────────────────────────────
-    # Statewide EIA reference generation mix. Load grows modestly above EIA
-    # baseline (+5-12%), distributed uniformly across zones.
-    # Represents a conservative world where data center buildout stalls.
-    (
-        name        = "A_low",
-        description = "Low: EIA reference generation, uniform modest load growth",
-        statewide_multipliers = Dict(
-            2030 => Dict("load"=>1.05, "solar"=>1.00, "wind"=>1.00, "wind_offshore"=>1.00, "ng"=>1.00, "coal"=>1.00, "nuclear"=>1.00),
-            2035 => Dict("load"=>1.08, "solar"=>1.00, "wind"=>1.00, "wind_offshore"=>1.00, "ng"=>1.00, "coal"=>1.00, "nuclear"=>1.00),
-            2040 => Dict("load"=>1.10, "solar"=>1.00, "wind"=>1.00, "wind_offshore"=>1.00, "ng"=>1.00, "coal"=>1.00, "nuclear"=>1.00),
-            2045 => Dict("load"=>1.12, "solar"=>1.00, "wind"=>1.00, "wind_offshore"=>1.00, "ng"=>1.00, "coal"=>1.00, "nuclear"=>1.00),
-        ),
-        # No zone-specific deviations for Scenario A -- uniform by design
-        zone_multipliers = Dict(
-            2030 => Dict{Int,Dict{String,Float64}}(),
-            2035 => Dict{Int,Dict{String,Float64}}(),
-            2040 => Dict{Int,Dict{String,Float64}}(),
-            2045 => Dict{Int,Dict{String,Float64}}(),
-        )
+  # ───────────────────────────────────────────────────────────────────────────
+  # SCENARIO A -- EIA AEO reference case.
+  # Defaults ARE the EIA CSV projection. Zonal overrides give modest regional
+  # variation in LOAD only (Far West + DFW above, rural below).
+  # ───────────────────────────────────────────────────────────────────────────
+  (
+    name = "A_low",
+    description = "EIA AEO reference case (base economic growth, no large data-center load)",
+    defaults = Dict(
+      2030 => Dict("load"=>1.13, "solar"=>4.51, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
+      2035 => Dict("load"=>1.21, "solar"=>5.8, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
+      2040 => Dict("load"=>1.31, "solar"=>6.87, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
+      2045 => Dict("load"=>1.41, "solar"=>8.04, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
     ),
+    overrides = Dict(
+      2030 => Dict(
+        301 => Dict("load"=>1.23, "solar"=>4.51, "wind"=>2.22, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
+        302 => Dict("load"=>1.09, "solar"=>4.51, "wind"=>2.26, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
+        303 => Dict("load"=>1.04, "solar"=>4.51, "wind"=>2.1, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
+        304 => Dict("load"=>1.08, "solar"=>4.78, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
+        305 => Dict("load"=>1.15, "solar"=>4.69, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
+        306 => Dict("load"=>1.12, "solar"=>4.51, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
+        307 => Dict("load"=>1.09, "solar"=>4.51, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
+        308 => Dict("load"=>1.23, "solar"=>4.78, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
+      ),
+      2035 => Dict(
+        301 => Dict("load"=>1.32, "solar"=>5.8, "wind"=>2.45, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
+        302 => Dict("load"=>1.17, "solar"=>5.8, "wind"=>2.5, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
+        303 => Dict("load"=>1.11, "solar"=>5.8, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
+        304 => Dict("load"=>1.16, "solar"=>6.15, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
+        305 => Dict("load"=>1.23, "solar"=>6.03, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
+        306 => Dict("load"=>1.2, "solar"=>5.8, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
+        307 => Dict("load"=>1.17, "solar"=>5.8, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
+        308 => Dict("load"=>1.32, "solar"=>6.15, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
+      ),
+      2040 => Dict(
+        301 => Dict("load"=>1.43, "solar"=>6.87, "wind"=>2.49, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
+        302 => Dict("load"=>1.27, "solar"=>6.87, "wind"=>2.53, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
+        303 => Dict("load"=>1.21, "solar"=>6.87, "wind"=>2.35, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
+        304 => Dict("load"=>1.26, "solar"=>7.28, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
+        305 => Dict("load"=>1.34, "solar"=>7.14, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
+        306 => Dict("load"=>1.3, "solar"=>6.87, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
+        307 => Dict("load"=>1.27, "solar"=>6.87, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
+        308 => Dict("load"=>1.43, "solar"=>7.28, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
+      ),
+      2045 => Dict(
+        301 => Dict("load"=>1.53, "solar"=>8.04, "wind"=>2.55, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
+        302 => Dict("load"=>1.36, "solar"=>8.04, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
+        303 => Dict("load"=>1.3, "solar"=>8.04, "wind"=>2.41, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
+        304 => Dict("load"=>1.35, "solar"=>8.52, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
+        305 => Dict("load"=>1.44, "solar"=>8.36, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
+        306 => Dict("load"=>1.4, "solar"=>8.04, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
+        307 => Dict("load"=>1.36, "solar"=>8.04, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
+        308 => Dict("load"=>1.53, "solar"=>8.52, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
+      ),
+    ),
+  ),
 
-    # ── Scenario B: ERCOT-Adjusted (Medium) ──────────────────────────────────
-    # Statewide: ERCOT adjusted methodology (~+35% load by 2030 statewide).
-    # Zonal: load growth concentrated in Far West (oil/gas) and DFW (data centers).
-    # Renewable buildout weighted toward existing resource-quality zones.
-    # Source: ERCOT 2025 LTLF (49.8% discount on data center requests).
-    (
-        name        = "B_ercot_adjusted",
-        description = "Medium: ERCOT-adjusted load, zone-specific growth (Far West + DFW heavy)",
-        statewide_multipliers = Dict(
-            2030 => Dict("load"=>1.35, "solar"=>1.33, "wind"=>1.24, "wind_offshore"=>1.00, "ng"=>0.95, "coal"=>0.90, "nuclear"=>1.00),
-            2035 => Dict("load"=>1.50, "solar"=>1.45, "wind"=>1.30, "wind_offshore"=>1.20, "ng"=>0.90, "coal"=>0.80, "nuclear"=>1.00),
-            2040 => Dict("load"=>1.65, "solar"=>1.58, "wind"=>1.36, "wind_offshore"=>1.50, "ng"=>0.85, "coal"=>0.70, "nuclear"=>0.95),
-            2045 => Dict("load"=>1.80, "solar"=>1.70, "wind"=>1.42, "wind_offshore"=>1.80, "ng"=>0.80, "coal"=>0.60, "nuclear"=>0.90),
-        ),
-        zone_multipliers = Dict(
-            # 2030: Far West oil/gas surge + DFW data center buildup begins
-            # Wind concentrated in 301/302 (resource quality weighting)
-            2030 => Dict(
-                301 => Dict("load"=>1.40, "wind"=>1.50, "ng"=>1.10),  # Far West: oil/gas load + wind buildout
-                302 => Dict("load"=>1.10, "wind"=>1.40),              # West: wind corridor
-                303 => Dict("load"=>1.05),                            # West/North: modest
-                304 => Dict("load"=>1.10, "solar"=>1.20),             # South: industrial + solar
-                305 => Dict("load"=>1.15),                            # S. Central: population
-                306 => Dict("load"=>1.15),                            # S. Central: population
-                307 => Dict("load"=>1.10, "wind_offshore"=>1.50),     # Coast: offshore wind
-                308 => Dict("load"=>1.50, "solar"=>1.20),             # DFW: data centers + solar
-            ),
-            2035 => Dict(
-                301 => Dict("load"=>1.55, "wind"=>1.60, "ng"=>1.15),
-                302 => Dict("load"=>1.12, "wind"=>1.50),
-                303 => Dict("load"=>1.08),
-                304 => Dict("load"=>1.15, "solar"=>1.30),
-                305 => Dict("load"=>1.20),
-                306 => Dict("load"=>1.20),
-                307 => Dict("load"=>1.15, "wind_offshore"=>1.80),
-                308 => Dict("load"=>1.70, "solar"=>1.35),
-            ),
-            2040 => Dict(
-                301 => Dict("load"=>1.65, "wind"=>1.70, "ng"=>1.10),
-                302 => Dict("load"=>1.15, "wind"=>1.60),
-                303 => Dict("load"=>1.10),
-                304 => Dict("load"=>1.18, "solar"=>1.40),
-                305 => Dict("load"=>1.25),
-                306 => Dict("load"=>1.25),
-                307 => Dict("load"=>1.20, "wind_offshore"=>2.00),
-                308 => Dict("load"=>1.85, "solar"=>1.50),
-            ),
-            2045 => Dict(
-                301 => Dict("load"=>1.70, "wind"=>1.80, "ng"=>1.05),
-                302 => Dict("load"=>1.18, "wind"=>1.70),
-                303 => Dict("load"=>1.12),
-                304 => Dict("load"=>1.20, "solar"=>1.50),
-                305 => Dict("load"=>1.28),
-                306 => Dict("load"=>1.28),
-                307 => Dict("load"=>1.25, "wind_offshore"=>2.20),
-                308 => Dict("load"=>2.00, "solar"=>1.65),
-            ),
-        )
+  # ───────────────────────────────────────────────────────────────────────────
+  # SCENARIO B -- ERCOT adjusted forecast.
+  # Statewide load ~1.80x by 2030 (ERCOT adjusted peak with data centers at
+  # 49.8% discount). Moderate renewable buildout above EIA; faster coal/ng
+  # retirement. Far West + DFW get the most load growth.
+  # ───────────────────────────────────────────────────────────────────────────
+  (
+    name = "B_med",
+    description = "ERCOT adjusted forecast (data centers at 49.8% discount, moderate renewables)",
+    defaults = Dict(
+      2030 => Dict("load"=>1.8, "solar"=>5.05, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
+      2035 => Dict("load"=>2.06, "solar"=>6.5, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
+      2040 => Dict("load"=>2.33, "solar"=>7.69, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
+      2045 => Dict("load"=>2.6, "solar"=>9.0, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
     ),
+    overrides = Dict(
+      2030 => Dict(
+        301 => Dict("load"=>2.2, "solar"=>5.05, "wind"=>2.9, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
+        302 => Dict("load"=>1.66, "solar"=>5.05, "wind"=>3.02, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
+        303 => Dict("load"=>1.44, "solar"=>5.05, "wind"=>2.55, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
+        304 => Dict("load"=>1.62, "solar"=>5.81, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
+        305 => Dict("load"=>1.89, "solar"=>5.56, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
+        306 => Dict("load"=>1.76, "solar"=>5.05, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
+        307 => Dict("load"=>1.66, "solar"=>5.05, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
+        308 => Dict("load"=>2.2, "solar"=>5.81, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
+      ),
+      2035 => Dict(
+        301 => Dict("load"=>2.51, "solar"=>6.5, "wind"=>3.2, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
+        302 => Dict("load"=>1.9, "solar"=>6.5, "wind"=>3.33, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
+        303 => Dict("load"=>1.65, "solar"=>6.5, "wind"=>2.82, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
+        304 => Dict("load"=>1.85, "solar"=>7.47, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
+        305 => Dict("load"=>2.16, "solar"=>7.15, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
+        306 => Dict("load"=>2.02, "solar"=>6.5, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
+        307 => Dict("load"=>1.9, "solar"=>6.5, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
+        308 => Dict("load"=>2.51, "solar"=>7.47, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
+      ),
+      2040 => Dict(
+        301 => Dict("load"=>2.84, "solar"=>7.69, "wind"=>3.25, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
+        302 => Dict("load"=>2.14, "solar"=>7.69, "wind"=>3.38, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
+        303 => Dict("load"=>1.86, "solar"=>7.69, "wind"=>2.86, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
+        304 => Dict("load"=>2.1, "solar"=>8.84, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
+        305 => Dict("load"=>2.45, "solar"=>8.46, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
+        306 => Dict("load"=>2.28, "solar"=>7.69, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
+        307 => Dict("load"=>2.14, "solar"=>7.69, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
+        308 => Dict("load"=>2.84, "solar"=>8.84, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
+      ),
+      2045 => Dict(
+        301 => Dict("load"=>3.17, "solar"=>9.0, "wind"=>3.34, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
+        302 => Dict("load"=>2.39, "solar"=>9.0, "wind"=>3.47, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
+        303 => Dict("load"=>2.08, "solar"=>9.0, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
+        304 => Dict("load"=>2.34, "solar"=>10.35, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
+        305 => Dict("load"=>2.73, "solar"=>9.9, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
+        306 => Dict("load"=>2.55, "solar"=>9.0, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
+        307 => Dict("load"=>2.39, "solar"=>9.0, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
+        308 => Dict("load"=>3.17, "solar"=>10.35, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
+      ),
+    ),
+  ),
 
-    # ── Scenario C: High / Unadjusted TSP Forecast ───────────────────────────
-    # Full unadjusted TSP large load additions, no discount applied.
-    # Maximum zonal differentiation: DFW and Far West see most aggressive growth.
-    # Aggressive renewable buildout required to meet demand.
-    # Source: ERCOT unadjusted 2025 LTLF (~208 GW by 2030 without discounting).
-    (
-        name        = "C_high",
-        description = "High: full unadjusted TSP forecast, aggressive zonal growth (DFW + Far West)",
-        statewide_multipliers = Dict(
-            2030 => Dict("load"=>1.65, "solar"=>1.65, "wind"=>1.48, "wind_offshore"=>1.50, "ng"=>1.05, "coal"=>0.75, "nuclear"=>1.00),
-            2035 => Dict("load"=>1.90, "solar"=>1.95, "wind"=>1.62, "wind_offshore"=>2.00, "ng"=>1.00, "coal"=>0.55, "nuclear"=>1.00),
-            2040 => Dict("load"=>2.15, "solar"=>2.30, "wind"=>1.76, "wind_offshore"=>2.50, "ng"=>0.90, "coal"=>0.40, "nuclear"=>0.95),
-            2045 => Dict("load"=>2.40, "solar"=>2.65, "wind"=>1.90, "wind_offshore"=>3.00, "ng"=>0.80, "coal"=>0.30, "nuclear"=>0.90),
-        ),
-        zone_multipliers = Dict(
-            2030 => Dict(
-                301 => Dict("load"=>1.80, "wind"=>1.80, "ng"=>1.20),  # Far West: max oil/gas surge
-                302 => Dict("load"=>1.20, "wind"=>1.70),              # West: aggressive wind
-                303 => Dict("load"=>1.10),
-                304 => Dict("load"=>1.20, "solar"=>1.40),
-                305 => Dict("load"=>1.30),
-                306 => Dict("load"=>1.30),
-                307 => Dict("load"=>1.20, "wind_offshore"=>2.00),
-                308 => Dict("load"=>2.00, "solar"=>1.50),             # DFW: full data center buildout
-            ),
-            2035 => Dict(
-                301 => Dict("load"=>2.00, "wind"=>2.00, "ng"=>1.25),
-                302 => Dict("load"=>1.25, "wind"=>1.85),
-                303 => Dict("load"=>1.12),
-                304 => Dict("load"=>1.25, "solar"=>1.55),
-                305 => Dict("load"=>1.38),
-                306 => Dict("load"=>1.38),
-                307 => Dict("load"=>1.28, "wind_offshore"=>2.50),
-                308 => Dict("load"=>2.30, "solar"=>1.70),
-            ),
-            2040 => Dict(
-                301 => Dict("load"=>2.20, "wind"=>2.20, "ng"=>1.20),
-                302 => Dict("load"=>1.30, "wind"=>2.00),
-                303 => Dict("load"=>1.15),
-                304 => Dict("load"=>1.30, "solar"=>1.70),
-                305 => Dict("load"=>1.45),
-                306 => Dict("load"=>1.45),
-                307 => Dict("load"=>1.35, "wind_offshore"=>3.00),
-                308 => Dict("load"=>2.60, "solar"=>1.90),
-            ),
-            2045 => Dict(
-                301 => Dict("load"=>2.40, "wind"=>2.40, "ng"=>1.10),
-                302 => Dict("load"=>1.35, "wind"=>2.15),
-                303 => Dict("load"=>1.18),
-                304 => Dict("load"=>1.35, "solar"=>1.85),
-                305 => Dict("load"=>1.52),
-                306 => Dict("load"=>1.52),
-                307 => Dict("load"=>1.42, "wind_offshore"=>3.50),
-                308 => Dict("load"=>2.90, "solar"=>2.10),
-            ),
-        )
+  # ───────────────────────────────────────────────────────────────────────────
+  # SCENARIO C -- ERCOT TSP realistic-high (toned-down upper bound).
+  # Statewide load ~2.25x by 2030 rising to ~2.82x by 2045. Aggressive
+  # renewable buildout to serve the higher load; fastest coal retirement.
+  # Far West + DFW see the most aggressive load growth.
+  # ───────────────────────────────────────────────────────────────────────────
+  (
+    name = "C_high",
+    description = "ERCOT TSP realistic-high (toned-down upper bound, aggressive renewables)",
+    defaults = Dict(
+      2030 => Dict("load"=>2.25, "solar"=>5.5, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
+      2035 => Dict("load"=>2.43, "solar"=>7.08, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
+      2040 => Dict("load"=>2.61, "solar"=>8.38, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
+      2045 => Dict("load"=>2.82, "solar"=>9.81, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
     ),
+    overrides = Dict(
+      2030 => Dict(
+        301 => Dict("load"=>2.75, "solar"=>5.5, "wind"=>3.29, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
+        302 => Dict("load"=>2.07, "solar"=>5.5, "wind"=>3.42, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
+        303 => Dict("load"=>1.8, "solar"=>5.5, "wind"=>2.89, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
+        304 => Dict("load"=>2.02, "solar"=>6.32, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
+        305 => Dict("load"=>2.36, "solar"=>6.05, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
+        306 => Dict("load"=>2.21, "solar"=>5.5, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
+        307 => Dict("load"=>2.07, "solar"=>5.5, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
+        308 => Dict("load"=>2.75, "solar"=>6.32, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
+      ),
+      2035 => Dict(
+        301 => Dict("load"=>2.96, "solar"=>7.08, "wind"=>3.62, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
+        302 => Dict("load"=>2.24, "solar"=>7.08, "wind"=>3.77, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
+        303 => Dict("load"=>1.94, "solar"=>7.08, "wind"=>3.19, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
+        304 => Dict("load"=>2.19, "solar"=>8.14, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
+        305 => Dict("load"=>2.55, "solar"=>7.79, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
+        306 => Dict("load"=>2.38, "solar"=>7.08, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
+        307 => Dict("load"=>2.24, "solar"=>7.08, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
+        308 => Dict("load"=>2.96, "solar"=>8.14, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
+      ),
+      2040 => Dict(
+        301 => Dict("load"=>3.18, "solar"=>8.38, "wind"=>3.67, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
+        302 => Dict("load"=>2.4, "solar"=>8.38, "wind"=>3.82, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
+        303 => Dict("load"=>2.09, "solar"=>8.38, "wind"=>3.23, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
+        304 => Dict("load"=>2.35, "solar"=>9.64, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
+        305 => Dict("load"=>2.74, "solar"=>9.22, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
+        306 => Dict("load"=>2.56, "solar"=>8.38, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
+        307 => Dict("load"=>2.4, "solar"=>8.38, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
+        308 => Dict("load"=>3.18, "solar"=>9.64, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
+      ),
+      2045 => Dict(
+        301 => Dict("load"=>3.44, "solar"=>9.81, "wind"=>3.77, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
+        302 => Dict("load"=>2.59, "solar"=>9.81, "wind"=>3.93, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
+        303 => Dict("load"=>2.26, "solar"=>9.81, "wind"=>3.32, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
+        304 => Dict("load"=>2.54, "solar"=>11.28, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
+        305 => Dict("load"=>2.96, "solar"=>10.79, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
+        306 => Dict("load"=>2.76, "solar"=>9.81, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
+        307 => Dict("load"=>2.59, "solar"=>9.81, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
+        308 => Dict("load"=>3.44, "solar"=>11.28, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
+      ),
+    ),
+  ),
 ]
 
-# ── Helper: load bus → zone mapping from power system data ───────────────────
+# ── Resolve the ratio for a (scenario, zone, fuel, year) ─────────────────────
+# override if present, else default.
 
-function load_zone_map(power_system_path::String)
-    println("Loading zone map from $power_system_path ...")
-    ps_data = JSON.parsefile(power_system_path)
-    zone_map = Dict{Int, Int}()  # bus_index → zone_id
-    for (bus_id_str, bus) in ps_data["bus"]
-        zone_map[parse(Int, bus_id_str)] = bus["zone_id"]
+function ratio_for(scenario, zone_id::Int, fuel::String, year::Int)
+    ov = get(get(scenario.overrides, year, Dict()), zone_id, Dict())
+    if haskey(ov, fuel)
+        return ov[fuel], true          # zonal override
     end
-    return zone_map
+    return scenario.defaults[year][fuel], false   # scenario default
 end
 
-# ── Helper: apply statewide + zonal multipliers to baseline CSV ───────────────
+# ── Load bus → zone mapping ───────────────────────────────────────────────────
 
-function apply_scenario(df::DataFrame, year::Int,
-                        statewide::Dict, zonal::Dict,
-                        zone_map::Dict{Int,Int})
-    df_new   = copy(df)
-    year_col = string(year)
-
-    if !(year_col in names(df_new))
-        error("Year column '$year_col' not found in CSV")
+function load_zone_map(path::String)
+    ps = JSON.parsefile(path)
+    zmap = Dict{Int,Int}()
+    for (bid, bus) in ps["bus"]
+        zmap[parse(Int, bid)] = bus["zone_id"]
     end
+    return zmap
+end
 
-    type_col = names(df_new)[1]
+# ── Write per-scenario per-year ratio JSON (read by update_decarbonization) ──
+# Structure: { "defaults": {fuel: ratio}, "zones": {zone_id: {fuel: ratio}} }
 
-    # For statewide fuel-type multipliers (coal, ng, nuclear, solar, wind etc.)
-    # these apply uniformly to all generators of that type
-    for (fuel_type, multiplier) in statewide
-        row_mask = df_new[!, type_col] .== fuel_type
-        if !any(row_mask)
-            @warn "Fuel type '$fuel_type' not found in CSV -- skipping"
-            continue
+function write_ratios_json(simdir::String, scenario, year::Int)
+    defaults = scenario.defaults[year]
+    zones_out = Dict{String,Any}()
+    for zid in sort(collect(keys(ZONE_NAMES)))
+        zone_ratios = Dict{String,Float64}()
+        for fuel in FUELS
+            r, _ = ratio_for(scenario, zid, fuel, year)
+            zone_ratios[fuel] = r
         end
-        df_new[row_mask, year_col] .*= multiplier
-    end
-
-    # Note: zonal multipliers cannot be applied directly to the statewide
-    # decarbonization CSV (which has one row per fuel type, not per zone).
-    # Instead, we write a separate zone_multipliers JSON file alongside the
-    # CSV. The update_decarbonization function would need to be extended to
-    # read this file and apply per-bus scaling. For now, we log the zonal
-    # multipliers so they are available for the next step.
-    return df_new
-end
-
-function write_zone_multipliers(simdir::String, year::Int,
-                                 zonal::Dict, zone_map::Dict{Int,Int})
-    # Write zone multipliers as a JSON file for later use when extending
-    # update_decarbonization to support per-zone scaling
-    zonal_out = Dict{String, Any}()
-    for (zone_id, fuel_mults) in zonal
-        zonal_out[string(zone_id)] = Dict{String, Any}(
-            "zone_name" => get(ZONE_NAMES, zone_id, "unknown"),
-            "multipliers" => fuel_mults
+        zones_out[string(zid)] = Dict(
+            "zone_name" => ZONE_NAMES[zid],
+            "ratios" => zone_ratios,
         )
     end
     out = Dict(
         "year" => year,
-        "description" => "Zone-specific multipliers applied ON TOP of statewide CSV values",
-        "source" => "ERCOT 2025 LTLF + ERCOT GIS Report + NREL ATB 2024",
-        "zones" => zonal_out
+        "scenario" => scenario.name,
+        "method" => "direct final ratio vs 2022 baseline: final = ratio x CSV[2022]",
+        "defaults" => defaults,
+        "zones" => zones_out,
     )
-    path = joinpath(simdir, "zone_multipliers_$(year).json")
+    path = joinpath(simdir, "scenario_ratios_$(year).json")
     open(path, "w") do f
         JSON.print(f, out, 2)
     end
     return path
 end
 
-function write_config(simdir::String, year::Int, decarb_abs_path::String,
-                      base_config::Dict)
+function write_config(simdir::String, year::Int, base_config::Dict; inv_dir=nothing)
     config = deepcopy(base_config)
-    config["decarbonization"]      = decarb_abs_path
+    config["decarbonization"]      = abspath(BASELINE_DECARB_CSV)  # source of 2022 baseline
     config["decarbonization_year"] = year
     config["dates"]                = REPRESENTATIVE_DATES
     config["num_representatives"]  = length(REPRESENTATIVE_DATES)
-    config["representative_prob"]  = fill(1.0 / length(REPRESENTATIVE_DATES),
-                                          length(REPRESENTATIVE_DATES))
-    config_path = joinpath(simdir, "config.toml")
-    open(config_path, "w") do f
+    config["representative_prob"]  = fill(1.0/length(REPRESENTATIVE_DATES), length(REPRESENTATIVE_DATES))
+    inv_dir !== nothing && (config["current_investment_dir"] = inv_dir)
+    open(joinpath(simdir, "config.toml"), "w") do f
         TOML.print(f, config)
     end
-    return config_path
+end
+
+# ── Fast-run investment files (optional) ─────────────────────────────────────
+
+function write_fast_run(dir::String, ps_path::String)
+    ps = JSON.parsefile(ps_path)
+    mkpath(dir)
+    lrows = []
+    for i in 1:length(ps["branch"])
+        b = ps["branch"][string(i)]
+        fb, tb = ps["bus"][string(b["f_bus"])], ps["bus"][string(b["t_bus"])]
+        push!(lrows, (Branch_Index=i, Lat1=fb["lat"], Lon1=fb["lon"],
+                      Lat2=tb["lat"], Lon2=tb["lon"], Rate_A=b["rate_a"], Upgrade_Lvl=1.0))
+    end
+    CSV.write(joinpath(dir,"line_investments.csv"), DataFrame(lrows))
+    srows = []
+    for i in 1:length(ps["bus"])
+        bus = ps["bus"][string(i)]
+        push!(srows, (Node_Index=i, Node_Name=get(bus,"bus_name","BUS_$i"),
+                      Lat=bus["lat"], Lon=bus["lon"], Storage_Energy=12.0))
+    end
+    CSV.write(joinpath(dir,"storage_investments.csv"), DataFrame(srows))
 end
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
-println("=== Zonal Scenario Generator ===")
+println("=== Scenario Generator (direct final ratios) ===")
 flush(stdout)
 
-println("Loading baseline CSV: $BASELINE_DECARB_CSV")
-flush(stdout)
-baseline_df = CSV.read(BASELINE_DECARB_CSV, DataFrame)
-println("  Loaded: $(nrow(baseline_df)) rows x $(ncol(baseline_df)) columns")
-flush(stdout)
-
-println("Loading baseline config: $BASELINE_CONFIG_TOML")
-flush(stdout)
 base_config = TOML.parsefile(BASELINE_CONFIG_TOML)
-println("  Loaded.")
+zone_map    = load_zone_map(POWER_SYSTEM_DATA)
+println("Loaded config + zone map ($(length(zone_map)) buses, $(length(unique(values(zone_map)))) zones)")
 flush(stdout)
 
-println("Loading zone map: $POWER_SYSTEM_DATA")
-flush(stdout)
-zone_map = load_zone_map(POWER_SYSTEM_DATA)
-println("  Loaded: $(length(zone_map)) buses across $(length(unique(values(zone_map)))) zones")
-flush(stdout)
-
+if isdir(OUTPUT_DIR)
+    existing = readdir(OUTPUT_DIR)
+    if !isempty(existing)
+        println("Clearing $(length(existing)) existing item(s) from $OUTPUT_DIR/ ...")
+        for f in existing
+            rm(joinpath(OUTPUT_DIR, f); recursive=true)
+        end
+    end
+end
 mkpath(OUTPUT_DIR)
+
+FAST_RUN_DIR = joinpath(OUTPUT_DIR, "fast_run_investments")
+if USE_FAST_RUN
+    write_fast_run(FAST_RUN_DIR, POWER_SYSTEM_DATA)
+    println("Wrote fast-run investment files.")
+end
+
 generated = String[]
-
 for scenario in SCENARIOS
-    println("\n── Scenario $(scenario.name) ──")
-    println("   $(scenario.description)")
+    println("\n── $(scenario.name): $(scenario.description)")
     flush(stdout)
-
     for year in PLANNING_YEARS
-        if !haskey(scenario.statewide_multipliers, year)
-            @warn "No multipliers for $(scenario.name) year $year -- skipping"
-            continue
-        end
-
-        statewide = scenario.statewide_multipliers[year]
-        zonal     = get(scenario.zone_multipliers, year, Dict{Int,Dict{String,Float64}}())
-
-        simdir_path = joinpath(OUTPUT_DIR, scenario.name, string(year))
-        mkpath(joinpath(simdir_path, "output"))
-        mkpath(joinpath(simdir_path, "visual"))
-
-        # Apply statewide multipliers and write CSV
-        df_mod       = apply_scenario(baseline_df, year, statewide, zonal, zone_map)
-        decarb_fname = "decarbonization_$(scenario.name)_$(year).csv"
-        decarb_path  = joinpath(simdir_path, decarb_fname)
-        CSV.write(decarb_path, df_mod)
-
-        # Write zone multipliers JSON for next step (extending update_decarbonization)
-        if !isempty(zonal)
-            zm_path = write_zone_multipliers(simdir_path, year, zonal, zone_map)
-            println("   ✓ $year → $simdir_path  [+zone_multipliers_$(year).json]")
-        else
-            println("   ✓ $year → $simdir_path  [statewide only]")
-        end
+        simdir = joinpath(OUTPUT_DIR, scenario.name, string(year))
+        mkpath(joinpath(simdir, "output"))
+        mkpath(joinpath(simdir, "visual"))
+        write_ratios_json(simdir, scenario, year)
+        write_config(simdir, year, base_config; inv_dir = USE_FAST_RUN ? abspath(FAST_RUN_DIR) : nothing)
+        println("   ✓ $year → $simdir")
+        push!(generated, simdir)
         flush(stdout)
-
-        # Write config
-        write_config(simdir_path, year, abspath(decarb_path), base_config)
-        push!(generated, simdir_path)
     end
 end
 
-println("\n=== Done: $(length(generated)) simdirs created under $OUTPUT_DIR/ ===")
-println("\nNext step: extend update_decarbonization to read zone_multipliers_<year>.json")
-println("and apply per-bus scaling based on bus → zone_id mapping.")
+println("\n=== Done: $(length(generated)) simdirs under $OUTPUT_DIR/ ===")
+println("Each simdir has scenario_ratios_<year>.json (direct ratios) + config.toml")
+println("update_decarbonization applies: final = ratio x CSV[2022_baseline]")
 flush(stdout)

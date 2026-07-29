@@ -28,9 +28,6 @@ import plotly.graph_objects as go
 
 # ── Args ──────────────────────────────────────────────────────────────────────
 simdir = sys.argv[1]
-# Build a readable scenario label from the path, e.g. "B_med / 2030"
-_parts = os.path.normpath(simdir).split(os.sep)
-scenario_label = " / ".join(_parts[-2:]) if len(_parts) >= 2 else os.path.basename(simdir)
 
 # ── Resolve paths regardless of where script is run from ─────────────────────
 candidates = [
@@ -190,10 +187,10 @@ fig.update_geos(
 fig.update_layout(
     title=dict(
         text=(
-            f"[SOLVED OUTPUT] Investment Decisions — Scenario {scenario_label}<br>"
+            f"TEP+Storage Investment Decisions — {os.path.basename(simdir)}<br>"
             f"<sup>{n_upgraded} line upgrades | "
             f"{n_storage} storage nodes | "
-            f"{total_mwh:.1f} MWh total storage — from line/storage_investments.csv</sup>"
+            f"{total_mwh:.1f} MWh total storage</sup>"
         ),
         font=dict(size=18)
     ),

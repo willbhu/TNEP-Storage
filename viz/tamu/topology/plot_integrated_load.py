@@ -19,17 +19,34 @@ OUTPUT:
 
 import json
 import sys
+import os
 import numpy as np
 import plotly.graph_objects as go
 
 # ── Args ──────────────────────────────────────────────────────────────────────
 simdir    = sys.argv[1]
+_parts = os.path.normpath(simdir).split(os.sep)
+scenario_label = " / ".join(_parts[-2:]) if len(_parts) >= 2 else os.path.basename(simdir)
 rep_index = int(sys.argv[2]) if len(sys.argv) > 2 else 1
 rep_key   = str(rep_index)
 BASE_MW   = 100.0  # data.json is in per-unit; multiply by 100 to get MW
 
+# ── Resolve data path regardless of where script is run from ──────────────────
+candidates = [
+    os.path.join(simdir, "data.json"),
+    os.path.join("../../../", simdir, "data.json"),
+    os.path.join(os.path.dirname(__file__), "../../../", simdir, "data.json"),
+]
+data_path = next((p for p in candidates if os.path.isfile(p)), None)
+if data_path is None:
+    print(f"ERROR: Could not find data.json for simdir='{simdir}'")
+    print("Run from your project root: python viz/tamu/topology/plot_integrated_load.py examples/example_simdir")
+    sys.exit(1)
+
+out_dir = os.path.dirname(data_path)
+
 # ── Load data ─────────────────────────────────────────────────────────────────
-with open(f"../../../{simdir}/data.json", "r") as f:
+with open(data_path, "r") as f:
     data = json.load(f)
 
 date_label = data["param"]["dates"][rep_index - 1]
@@ -123,14 +140,16 @@ fig.update_geos(
 
 fig.update_layout(
     title=dict(
-        text=f"24-Hour Integrated Load per Bus — {date_label}<br>"
-             f"<sup>Circle size and color = total MWh consumed over the day</sup>",
+        text=f"[MODEL INPUT] 24-Hour Integrated Load per Bus — Scenario {scenario_label} ({date_label})<br>"
+             f"<sup>Scaled load fed INTO the model (from data.json). Size/color = total MWh over the day.</sup>",
         font=dict(size=18)
     ),
     margin=dict(l=0, r=0, t=60, b=0)
 )
 
-out_path = f"../../../{simdir}/integrated_load_geo.html"
+visual_dir = os.path.join(out_dir, "visual")
+os.makedirs(visual_dir, exist_ok=True)
+out_path = os.path.join(visual_dir, "integrated_load_geo.html")
 fig.write_html(out_path)
 print(f"Saved to {out_path}")
 

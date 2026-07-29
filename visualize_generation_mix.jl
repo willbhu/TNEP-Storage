@@ -33,6 +33,8 @@ Output:
 
 using Plots
 using JSON
+
+SCENARIO_LABEL = ""  # set in main() from the simdir path
 using CSV
 using DataFrames
 
@@ -66,7 +68,7 @@ function plot_capacity_pie(data, output_path)
     end
 
     p = pie(labels, values_,
-            title="Generation Capacity Mix (Max Capacity, MW)",
+            title="[MODEL INPUT] Installed Capacity by Fuel Type — $SCENARIO_LABEL\n(pmax MW, scaled capacity fed into the model)",
             legend=:outertopright)
     savefig(p, output_path)
     println("Saved pie chart to $output_path")
@@ -155,7 +157,7 @@ function plot_daily_stacked(data, rep_index, output_path)
 
     p = areaplot(hours, gen_matrix,
                  label=reshape(gen_labels, 1, length(gen_labels)),
-                 title="Statewide Available Capacity vs. Load - Rep. Day $rep_index\n(Nonrenewable layer = pmax ceiling, not actual dispatch)",
+                 title="[MODEL INPUT] Available Capacity vs. Load — $SCENARIO_LABEL, Rep. Day $rep_index\n(Pre-solve: renewable profiles + nonrenewable pmax ceiling vs scaled load)",
                  xlabel="Hour", ylabel="Power (MW)",
                  legend=:outertopright)
 
@@ -215,7 +217,7 @@ function plot_actual_dispatch(simdir, data, rep_index, output_path)
 
     p = areaplot(hours, dispatch_matrix,
                  label=reshape(string.(active_types), 1, length(active_types)),
-                 title="Statewide Actual Dispatch (Solved) - Rep. Day $rep_index",
+                 title="[SOLVED OUTPUT] Actual Dispatch — $SCENARIO_LABEL, Rep. Day $rep_index\n(Real pg from the solved model, energy.csv)",
                  xlabel="Hour", ylabel="Power (MW)",
                  legend=:outertopright)
 
@@ -235,6 +237,11 @@ function main()
 
     simdir = ARGS[1]
     rep_index = length(ARGS) >= 2 ? parse(Int, ARGS[2]) : 1
+
+    # Scenario label from the simdir path, e.g. "B_med / 2030"
+    _parts = splitpath(rstrip(simdir, ['/','\\']))
+    scenario_label = length(_parts) >= 2 ? join(_parts[end-1:end], " / ") : basename(simdir)
+    global SCENARIO_LABEL = scenario_label
 
     visual_dir = joinpath(simdir, "visual")
     mkpath(visual_dir)
