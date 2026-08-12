@@ -134,6 +134,17 @@ function plot_daily_stacked(data, rep_index, output_path)
     # Active nonrenewable types (nonzero installed capacity)
     active_nonrenewables = sort([rt for (rt, vals) in nonrenewable_profiles if sum(vals) > 0])
 
+    # STACKING ORDER (per meeting notes 7/29): static baseload at the BOTTOM.
+    # Coal and nuclear run flat around the clock, so putting them at the base
+    # of the stack gives a stable foundation and makes the variable renewable
+    # layers above them readable. Order: nuclear -> coal -> other thermal ->
+    # renewables on top.
+    baseload_names = ["nuclear", "coal"]
+    baseload_types = [t for t in active_nonrenewables if string(t) in baseload_names]
+    sort!(baseload_types, by = t -> findfirst(==(string(t)), baseload_names))
+    other_thermal  = sort([t for t in active_nonrenewables if !(string(t) in baseload_names)], by = string)
+    active_nonrenewables = vcat(baseload_types, other_thermal)
+
     if isempty(active_renewables) && isempty(active_nonrenewables)
         println("Warning: no nonzero generation found for rep_index=$rep_index")
     end
@@ -147,11 +158,13 @@ function plot_daily_stacked(data, rep_index, output_path)
     # cumulative height of everything below it. This version instead lets you
     # directly compare "how high is the load line" vs "how high is the total
     # generation area" -- the real pre-solve feasibility check.
-    gen_labels = vcat(active_renewables,
-                       ["$(rt) (capacity ceiling)" for rt in active_nonrenewables])
+    # Baseload (nuclear, coal, then other thermal) at the BOTTOM of the stack,
+    # variable renewables layered on top.
+    gen_labels = vcat(["$(rt) (capacity ceiling)" for rt in active_nonrenewables],
+                       active_renewables)
     gen_series = vcat(
-        [renewable_profiles[rt] for rt in active_renewables],
-        [nonrenewable_profiles[rt] for rt in active_nonrenewables]
+        [nonrenewable_profiles[rt] for rt in active_nonrenewables],
+        [renewable_profiles[rt] for rt in active_renewables]
     )
     gen_matrix = hcat(gen_series...)
 
@@ -201,6 +214,16 @@ function plot_actual_dispatch(simdir, data, rep_index, output_path)
     if isempty(active_types)
         println("Warning: no nonzero dispatch found in $energy_csv_path")
     end
+
+    # STACKING ORDER (per meeting notes 7/29): static baseload at the BOTTOM.
+    # Nuclear and coal run flat around the clock, so they form a stable base
+    # for the stack; variable renewables layer on top where their shape is
+    # readable against a steady foundation.
+    baseload_names = ["nuclear", "coal"]
+    baseload_types = [t for t in active_types if string(t) in baseload_names]
+    sort!(baseload_types, by = t -> findfirst(==(string(t)), baseload_names))
+    other_types    = sort([t for t in active_types if !(string(t) in baseload_names)], by = string)
+    active_types   = vcat(baseload_types, other_types)
 
     BASE_POWER = 100.0
     dispatch_matrix = hcat([grouped[!, Symbol(gt)] .* BASE_POWER for gt in active_types]...)

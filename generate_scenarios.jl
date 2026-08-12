@@ -34,16 +34,34 @@ ZONE MAP (from power_system_data.json):
     307 Coast (Gulf Coast)        -- offshore wind
     308 North Central (DFW)       -- data centers
 
-SCENARIOS:
-    A_low  = EIA AEO reference case (ratios ARE the EIA CSV projection)
-    B_med  = ERCOT adjusted forecast (data centers at 49.8% discount)
-    C_high = ERCOT TSP realistic-high (data centers, toned-down upper bound)
+SCENARIOS (each varies a DIFFERENT dimension, so effects can be isolated):
+    A_low  = EIA AEO reference case. Baseline load AND baseline generation.
+    B_med  = HIGHER ORGANIC LOAD growth (industrial, electrification, oil & gas).
+             Generation stays at the EIA reference. Isolates the load effect.
+    C_fossil = SAME LOAD AS B, but a strongly FOSSIL-HEAVY GENERATION MIX:
+             solar ~35% of EIA, wind ~50% of EIA, offshore wind ~25% of EIA,
+             gas GROWS 15-40% above 2022 (new CCGT build) instead of retiring,
+             coal held at 2022 levels through 2035. Renewables end at ~68% of
+             capacity vs ~88% in A/B. Isolates the generation-mix effect.
+
+    NOTE: data-center demand is NOT in these load ratios. Data centers are a
+    separate NODAL layer applied by add_data_centers.jl, which creates
+    <scenario>_dc twins. This keeps load growth and data-center growth as
+    independent, comparable dimensions.
 
 SOURCES:
     ERCOT 2025 LTDEF   https://www.ercot.com/files/docs/2025/04/08/ERCOT-2025-Long-Term-Load-Forecast-Report.pdf
     ERCOT RPG          https://www.ercot.com/files/docs/2025/04/29/Long-term-Load-Forecast-RPG.pdf
     EIA AEO 2023       https://www.eia.gov/outlooks/aeo/
     NREL ATB 2024      https://atb.nrel.gov/electricity/2024/
+
+FIXED INVESTMENTS (fast runs):
+    Set FIXED_INVESTMENT_DIR below to a folder containing pre-set
+    line_investments.csv and storage_investments.csv. Every generated config
+    then gets `current_investment_dir` pointing at it, which lets the model
+    skip solving investments from scratch. Per Kevin: Upgrade_Lvl all 1.0 in
+    line_investments.csv, Storage_Energy all 12.0 in storage_investments.csv.
+    Set to `nothing` to disable and let the model solve investments normally.
 
 USAGE (from project root):
     using CSV, DataFrames, TOML, JSON
@@ -64,13 +82,20 @@ OUTPUT_DIR           = "scenarios"
 PLANNING_YEARS       = [2030, 2035, 2040, 2045]
 
 # FAST TEST (1 day). Swap in the 18-day list below for real runs.
-#REPRESENTATIVE_DATES = ["2016-08-11"]
-REPRESENTATIVE_DATES = [
-      "2016-01-27","2016-02-23","2016-03-06","2016-03-11","2016-03-22","2016-03-27",
-      "2016-04-03","2016-04-22","2016-05-10","2016-05-19","2016-06-21","2016-07-11",
-      "2016-08-11","2016-09-02","2016-09-10","2016-11-16","2016-12-03","2016-12-08"]
+REPRESENTATIVE_DATES = ["2016-08-11"]
+# REPRESENTATIVE_DATES = [
+#     "2016-01-27","2016-02-23","2016-03-06","2016-03-11","2016-03-22","2016-03-27",
+#     "2016-04-03","2016-04-22","2016-05-10","2016-05-19","2016-06-21","2016-07-11",
+#     "2016-08-11","2016-09-02","2016-09-10","2016-11-16","2016-12-03","2016-12-08"]
 
-USE_FAST_RUN = false
+# ── Fixed investments (fast run) ──────────────────────────────────────────────
+# Per Kevin: to run the model faster, supply pre-set investment files and point
+# `current_investment_dir` at the folder containing them:
+#     line_investments.csv     -- Upgrade_Lvl all set to 1.0
+#     storage_investments.csv  -- Storage_Energy all set to 12.0
+# Set FIXED_INVESTMENT_DIR to that folder to enable for ALL scenarios.
+# Set to nothing to disable (model solves investments from scratch).
+FIXED_INVESTMENT_DIR = "current_investment_dir"   # or `nothing` to disable
 
 ZONE_NAMES = Dict(
     301 => "Far West (Permian Basin)",
@@ -95,178 +120,159 @@ FUELS = ["load", "solar", "wind", "wind_offshore", "ng", "coal", "nuclear"]
 
 const SCENARIOS = [
 
-  # ───────────────────────────────────────────────────────────────────────────
-  # SCENARIO A -- EIA AEO reference case.
-  # Defaults ARE the EIA CSV projection. Zonal overrides give modest regional
-  # variation in LOAD only (Far West + DFW above, rural below).
-  # ───────────────────────────────────────────────────────────────────────────
   (
     name = "A_low",
-    description = "EIA AEO reference case (base economic growth, no large data-center load)",
+    description = "EIA AEO reference case — baseline load and generation",
     defaults = Dict(
-      2030 => Dict("load"=>1.13, "solar"=>4.51, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
-      2035 => Dict("load"=>1.21, "solar"=>5.8, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
-      2040 => Dict("load"=>1.31, "solar"=>6.87, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
-      2045 => Dict("load"=>1.41, "solar"=>8.04, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
+      2030 => Dict("load"=>1.126, "solar"=>4.511, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+      2035 => Dict("load"=>1.214, "solar"=>5.799, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+      2040 => Dict("load"=>1.307, "solar"=>6.873, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+      2045 => Dict("load"=>1.408, "solar"=>8.039, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
     ),
     overrides = Dict(
       2030 => Dict(
-        301 => Dict("load"=>1.23, "solar"=>4.51, "wind"=>2.22, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
-        302 => Dict("load"=>1.09, "solar"=>4.51, "wind"=>2.26, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
-        303 => Dict("load"=>1.04, "solar"=>4.51, "wind"=>2.1, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
-        304 => Dict("load"=>1.08, "solar"=>4.78, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
-        305 => Dict("load"=>1.15, "solar"=>4.69, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
-        306 => Dict("load"=>1.12, "solar"=>4.51, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
-        307 => Dict("load"=>1.09, "solar"=>4.51, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
-        308 => Dict("load"=>1.23, "solar"=>4.78, "wind"=>2.02, "wind_offshore"=>21.6, "ng"=>0.79, "coal"=>0.82, "nuclear"=>0.98),
+        301 => Dict("load"=>1.23, "solar"=>4.511, "wind"=>2.22, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        302 => Dict("load"=>1.09, "solar"=>4.511, "wind"=>2.26, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        303 => Dict("load"=>1.04, "solar"=>4.511, "wind"=>2.1, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        304 => Dict("load"=>1.08, "solar"=>4.78, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        305 => Dict("load"=>1.15, "solar"=>4.69, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        306 => Dict("load"=>1.12, "solar"=>4.511, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        307 => Dict("load"=>1.09, "solar"=>4.511, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        308 => Dict("load"=>1.23, "solar"=>4.78, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
       ),
       2035 => Dict(
-        301 => Dict("load"=>1.32, "solar"=>5.8, "wind"=>2.45, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
-        302 => Dict("load"=>1.17, "solar"=>5.8, "wind"=>2.5, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
-        303 => Dict("load"=>1.11, "solar"=>5.8, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
-        304 => Dict("load"=>1.16, "solar"=>6.15, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
-        305 => Dict("load"=>1.23, "solar"=>6.03, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
-        306 => Dict("load"=>1.2, "solar"=>5.8, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
-        307 => Dict("load"=>1.17, "solar"=>5.8, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
-        308 => Dict("load"=>1.32, "solar"=>6.15, "wind"=>2.23, "wind_offshore"=>50.6, "ng"=>0.73, "coal"=>0.82, "nuclear"=>0.9),
+        301 => Dict("load"=>1.32, "solar"=>5.799, "wind"=>2.45, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        302 => Dict("load"=>1.18, "solar"=>5.799, "wind"=>2.49, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        303 => Dict("load"=>1.12, "solar"=>5.799, "wind"=>2.32, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        304 => Dict("load"=>1.17, "solar"=>6.15, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        305 => Dict("load"=>1.24, "solar"=>6.03, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        306 => Dict("load"=>1.2, "solar"=>5.799, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        307 => Dict("load"=>1.18, "solar"=>5.799, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        308 => Dict("load"=>1.32, "solar"=>6.15, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
       ),
       2040 => Dict(
-        301 => Dict("load"=>1.43, "solar"=>6.87, "wind"=>2.49, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
-        302 => Dict("load"=>1.27, "solar"=>6.87, "wind"=>2.53, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
-        303 => Dict("load"=>1.21, "solar"=>6.87, "wind"=>2.35, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
-        304 => Dict("load"=>1.26, "solar"=>7.28, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
-        305 => Dict("load"=>1.34, "solar"=>7.14, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
-        306 => Dict("load"=>1.3, "solar"=>6.87, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
-        307 => Dict("load"=>1.27, "solar"=>6.87, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
-        308 => Dict("load"=>1.43, "solar"=>7.28, "wind"=>2.26, "wind_offshore"=>50.6, "ng"=>0.71, "coal"=>0.82, "nuclear"=>0.8),
+        301 => Dict("load"=>1.42, "solar"=>6.873, "wind"=>2.49, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        302 => Dict("load"=>1.27, "solar"=>6.873, "wind"=>2.54, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        303 => Dict("load"=>1.2, "solar"=>6.873, "wind"=>2.35, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        304 => Dict("load"=>1.25, "solar"=>7.29, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        305 => Dict("load"=>1.33, "solar"=>7.15, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        306 => Dict("load"=>1.3, "solar"=>6.873, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        307 => Dict("load"=>1.27, "solar"=>6.873, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        308 => Dict("load"=>1.42, "solar"=>7.29, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
       ),
       2045 => Dict(
-        301 => Dict("load"=>1.53, "solar"=>8.04, "wind"=>2.55, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
-        302 => Dict("load"=>1.36, "solar"=>8.04, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
-        303 => Dict("load"=>1.3, "solar"=>8.04, "wind"=>2.41, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
-        304 => Dict("load"=>1.35, "solar"=>8.52, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
-        305 => Dict("load"=>1.44, "solar"=>8.36, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
-        306 => Dict("load"=>1.4, "solar"=>8.04, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
-        307 => Dict("load"=>1.36, "solar"=>8.04, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
-        308 => Dict("load"=>1.53, "solar"=>8.52, "wind"=>2.32, "wind_offshore"=>50.6, "ng"=>0.72, "coal"=>0.82, "nuclear"=>0.8),
+        301 => Dict("load"=>1.53, "solar"=>8.039, "wind"=>2.55, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        302 => Dict("load"=>1.36, "solar"=>8.039, "wind"=>2.6, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        303 => Dict("load"=>1.3, "solar"=>8.039, "wind"=>2.41, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        304 => Dict("load"=>1.35, "solar"=>8.52, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        305 => Dict("load"=>1.44, "solar"=>8.36, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        306 => Dict("load"=>1.4, "solar"=>8.039, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        307 => Dict("load"=>1.36, "solar"=>8.039, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        308 => Dict("load"=>1.53, "solar"=>8.52, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
       ),
     ),
   ),
-
-  # ───────────────────────────────────────────────────────────────────────────
-  # SCENARIO B -- ERCOT adjusted forecast.
-  # Statewide load ~1.80x by 2030 (ERCOT adjusted peak with data centers at
-  # 49.8% discount). Moderate renewable buildout above EIA; faster coal/ng
-  # retirement. Far West + DFW get the most load growth.
-  # ───────────────────────────────────────────────────────────────────────────
   (
     name = "B_med",
-    description = "ERCOT adjusted forecast (data centers at 49.8% discount, moderate renewables)",
+    description = "Higher organic load growth (industrial + electrification), EIA-reference generation",
     defaults = Dict(
-      2030 => Dict("load"=>1.8, "solar"=>5.05, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
-      2035 => Dict("load"=>2.06, "solar"=>6.5, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
-      2040 => Dict("load"=>2.33, "solar"=>7.69, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
-      2045 => Dict("load"=>2.6, "solar"=>9.0, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
+      2030 => Dict("load"=>1.22, "solar"=>4.511, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+      2035 => Dict("load"=>1.36, "solar"=>5.799, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+      2040 => Dict("load"=>1.5, "solar"=>6.873, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+      2045 => Dict("load"=>1.66, "solar"=>8.039, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
     ),
     overrides = Dict(
       2030 => Dict(
-        301 => Dict("load"=>2.2, "solar"=>5.05, "wind"=>2.9, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
-        302 => Dict("load"=>1.66, "solar"=>5.05, "wind"=>3.02, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
-        303 => Dict("load"=>1.44, "solar"=>5.05, "wind"=>2.55, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
-        304 => Dict("load"=>1.62, "solar"=>5.81, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
-        305 => Dict("load"=>1.89, "solar"=>5.56, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
-        306 => Dict("load"=>1.76, "solar"=>5.05, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
-        307 => Dict("load"=>1.66, "solar"=>5.05, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
-        308 => Dict("load"=>2.2, "solar"=>5.81, "wind"=>2.32, "wind_offshore"=>21.6, "ng"=>0.73, "coal"=>0.66, "nuclear"=>0.98),
+        301 => Dict("load"=>1.49, "solar"=>4.511, "wind"=>2.52, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        302 => Dict("load"=>1.12, "solar"=>4.511, "wind"=>2.62, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        303 => Dict("load"=>0.98, "solar"=>4.511, "wind"=>2.22, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        304 => Dict("load"=>1.1, "solar"=>5.19, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        305 => Dict("load"=>1.28, "solar"=>4.96, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        306 => Dict("load"=>1.2, "solar"=>4.511, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        307 => Dict("load"=>1.12, "solar"=>4.511, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
+        308 => Dict("load"=>1.49, "solar"=>5.19, "wind"=>2.015, "wind_offshore"=>21.628, "ng"=>0.787, "coal"=>0.821, "nuclear"=>0.975),
       ),
       2035 => Dict(
-        301 => Dict("load"=>2.51, "solar"=>6.5, "wind"=>3.2, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
-        302 => Dict("load"=>1.9, "solar"=>6.5, "wind"=>3.33, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
-        303 => Dict("load"=>1.65, "solar"=>6.5, "wind"=>2.82, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
-        304 => Dict("load"=>1.85, "solar"=>7.47, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
-        305 => Dict("load"=>2.16, "solar"=>7.15, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
-        306 => Dict("load"=>2.02, "solar"=>6.5, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
-        307 => Dict("load"=>1.9, "solar"=>6.5, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
-        308 => Dict("load"=>2.51, "solar"=>7.47, "wind"=>2.56, "wind_offshore"=>50.6, "ng"=>0.67, "coal"=>0.66, "nuclear"=>0.9),
+        301 => Dict("load"=>1.66, "solar"=>5.799, "wind"=>2.78, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        302 => Dict("load"=>1.25, "solar"=>5.799, "wind"=>2.89, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        303 => Dict("load"=>1.09, "solar"=>5.799, "wind"=>2.45, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        304 => Dict("load"=>1.22, "solar"=>6.67, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        305 => Dict("load"=>1.43, "solar"=>6.38, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        306 => Dict("load"=>1.33, "solar"=>5.799, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        307 => Dict("load"=>1.25, "solar"=>5.799, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
+        308 => Dict("load"=>1.66, "solar"=>6.67, "wind"=>2.226, "wind_offshore"=>50.632, "ng"=>0.73, "coal"=>0.821, "nuclear"=>0.902),
       ),
       2040 => Dict(
-        301 => Dict("load"=>2.84, "solar"=>7.69, "wind"=>3.25, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
-        302 => Dict("load"=>2.14, "solar"=>7.69, "wind"=>3.38, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
-        303 => Dict("load"=>1.86, "solar"=>7.69, "wind"=>2.86, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
-        304 => Dict("load"=>2.1, "solar"=>8.84, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
-        305 => Dict("load"=>2.45, "solar"=>8.46, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
-        306 => Dict("load"=>2.28, "solar"=>7.69, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
-        307 => Dict("load"=>2.14, "solar"=>7.69, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
-        308 => Dict("load"=>2.84, "solar"=>8.84, "wind"=>2.6, "wind_offshore"=>50.6, "ng"=>0.65, "coal"=>0.66, "nuclear"=>0.8),
+        301 => Dict("load"=>1.83, "solar"=>6.873, "wind"=>2.83, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        302 => Dict("load"=>1.38, "solar"=>6.873, "wind"=>2.94, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        303 => Dict("load"=>1.2, "solar"=>6.873, "wind"=>2.49, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        304 => Dict("load"=>1.35, "solar"=>7.9, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        305 => Dict("load"=>1.58, "solar"=>7.56, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        306 => Dict("load"=>1.47, "solar"=>6.873, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        307 => Dict("load"=>1.38, "solar"=>6.873, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
+        308 => Dict("load"=>1.83, "solar"=>7.9, "wind"=>2.264, "wind_offshore"=>50.632, "ng"=>0.714, "coal"=>0.821, "nuclear"=>0.801),
       ),
       2045 => Dict(
-        301 => Dict("load"=>3.17, "solar"=>9.0, "wind"=>3.34, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
-        302 => Dict("load"=>2.39, "solar"=>9.0, "wind"=>3.47, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
-        303 => Dict("load"=>2.08, "solar"=>9.0, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
-        304 => Dict("load"=>2.34, "solar"=>10.35, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
-        305 => Dict("load"=>2.73, "solar"=>9.9, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
-        306 => Dict("load"=>2.55, "solar"=>9.0, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
-        307 => Dict("load"=>2.39, "solar"=>9.0, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
-        308 => Dict("load"=>3.17, "solar"=>10.35, "wind"=>2.67, "wind_offshore"=>50.6, "ng"=>0.66, "coal"=>0.66, "nuclear"=>0.8),
+        301 => Dict("load"=>2.03, "solar"=>8.039, "wind"=>2.9, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        302 => Dict("load"=>1.53, "solar"=>8.039, "wind"=>3.01, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        303 => Dict("load"=>1.33, "solar"=>8.039, "wind"=>2.55, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        304 => Dict("load"=>1.49, "solar"=>9.24, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        305 => Dict("load"=>1.74, "solar"=>8.84, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        306 => Dict("load"=>1.63, "solar"=>8.039, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        307 => Dict("load"=>1.53, "solar"=>8.039, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
+        308 => Dict("load"=>2.03, "solar"=>9.24, "wind"=>2.318, "wind_offshore"=>50.632, "ng"=>0.718, "coal"=>0.821, "nuclear"=>0.801),
       ),
     ),
   ),
-
-  # ───────────────────────────────────────────────────────────────────────────
-  # SCENARIO C -- ERCOT TSP realistic-high (toned-down upper bound).
-  # Statewide load ~2.25x by 2030 rising to ~2.82x by 2045. Aggressive
-  # renewable buildout to serve the higher load; fastest coal retirement.
-  # Far West + DFW see the most aggressive load growth.
-  # ───────────────────────────────────────────────────────────────────────────
   (
-    name = "C_high",
-    description = "ERCOT TSP realistic-high (toned-down upper bound, aggressive renewables)",
+    name = "C_fossil",
+    description = "Same load as B, FOSSIL-HEAVY generation — solar 35% / wind 50% of EIA, gas grows, coal held",
     defaults = Dict(
-      2030 => Dict("load"=>2.25, "solar"=>5.5, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
-      2035 => Dict("load"=>2.43, "solar"=>7.08, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
-      2040 => Dict("load"=>2.61, "solar"=>8.38, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
-      2045 => Dict("load"=>2.82, "solar"=>9.81, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
+      2030 => Dict("load"=>1.22, "solar"=>1.58, "wind"=>1.01, "wind_offshore"=>5.41, "ng"=>1.15, "coal"=>1.0, "nuclear"=>0.975),
+      2035 => Dict("load"=>1.36, "solar"=>2.03, "wind"=>1.11, "wind_offshore"=>12.66, "ng"=>1.25, "coal"=>1.0, "nuclear"=>0.902),
+      2040 => Dict("load"=>1.5, "solar"=>2.41, "wind"=>1.13, "wind_offshore"=>12.66, "ng"=>1.32, "coal"=>0.95, "nuclear"=>0.801),
+      2045 => Dict("load"=>1.66, "solar"=>2.81, "wind"=>1.16, "wind_offshore"=>12.66, "ng"=>1.4, "coal"=>0.9, "nuclear"=>0.801),
     ),
     overrides = Dict(
       2030 => Dict(
-        301 => Dict("load"=>2.75, "solar"=>5.5, "wind"=>3.29, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
-        302 => Dict("load"=>2.07, "solar"=>5.5, "wind"=>3.42, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
-        303 => Dict("load"=>1.8, "solar"=>5.5, "wind"=>2.89, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
-        304 => Dict("load"=>2.02, "solar"=>6.32, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
-        305 => Dict("load"=>2.36, "solar"=>6.05, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
-        306 => Dict("load"=>2.21, "solar"=>5.5, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
-        307 => Dict("load"=>2.07, "solar"=>5.5, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
-        308 => Dict("load"=>2.75, "solar"=>6.32, "wind"=>2.63, "wind_offshore"=>21.6, "ng"=>0.67, "coal"=>0.45, "nuclear"=>0.98),
+        301 => Dict("load"=>1.49, "solar"=>1.58, "wind"=>1.26, "wind_offshore"=>5.41, "ng"=>1.15, "coal"=>1.0, "nuclear"=>0.975),
+        302 => Dict("load"=>1.12, "solar"=>1.58, "wind"=>1.31, "wind_offshore"=>5.41, "ng"=>1.15, "coal"=>1.0, "nuclear"=>0.975),
+        303 => Dict("load"=>0.98, "solar"=>1.58, "wind"=>1.11, "wind_offshore"=>5.41, "ng"=>1.15, "coal"=>1.0, "nuclear"=>0.975),
+        304 => Dict("load"=>1.1, "solar"=>1.82, "wind"=>1.01, "wind_offshore"=>5.41, "ng"=>1.15, "coal"=>1.0, "nuclear"=>0.975),
+        305 => Dict("load"=>1.28, "solar"=>1.74, "wind"=>1.01, "wind_offshore"=>5.41, "ng"=>1.15, "coal"=>1.0, "nuclear"=>0.975),
+        306 => Dict("load"=>1.2, "solar"=>1.58, "wind"=>1.01, "wind_offshore"=>5.41, "ng"=>1.15, "coal"=>1.0, "nuclear"=>0.975),
+        307 => Dict("load"=>1.12, "solar"=>1.58, "wind"=>1.01, "wind_offshore"=>5.41, "ng"=>1.15, "coal"=>1.0, "nuclear"=>0.975),
+        308 => Dict("load"=>1.49, "solar"=>1.82, "wind"=>1.01, "wind_offshore"=>5.41, "ng"=>1.15, "coal"=>1.0, "nuclear"=>0.975),
       ),
       2035 => Dict(
-        301 => Dict("load"=>2.96, "solar"=>7.08, "wind"=>3.62, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
-        302 => Dict("load"=>2.24, "solar"=>7.08, "wind"=>3.77, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
-        303 => Dict("load"=>1.94, "solar"=>7.08, "wind"=>3.19, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
-        304 => Dict("load"=>2.19, "solar"=>8.14, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
-        305 => Dict("load"=>2.55, "solar"=>7.79, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
-        306 => Dict("load"=>2.38, "solar"=>7.08, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
-        307 => Dict("load"=>2.24, "solar"=>7.08, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
-        308 => Dict("load"=>2.96, "solar"=>8.14, "wind"=>2.9, "wind_offshore"=>50.6, "ng"=>0.62, "coal"=>0.45, "nuclear"=>0.9),
+        301 => Dict("load"=>1.66, "solar"=>2.03, "wind"=>1.39, "wind_offshore"=>12.66, "ng"=>1.25, "coal"=>1.0, "nuclear"=>0.902),
+        302 => Dict("load"=>1.25, "solar"=>2.03, "wind"=>1.44, "wind_offshore"=>12.66, "ng"=>1.25, "coal"=>1.0, "nuclear"=>0.902),
+        303 => Dict("load"=>1.09, "solar"=>2.03, "wind"=>1.22, "wind_offshore"=>12.66, "ng"=>1.25, "coal"=>1.0, "nuclear"=>0.902),
+        304 => Dict("load"=>1.22, "solar"=>2.33, "wind"=>1.11, "wind_offshore"=>12.66, "ng"=>1.25, "coal"=>1.0, "nuclear"=>0.902),
+        305 => Dict("load"=>1.43, "solar"=>2.23, "wind"=>1.11, "wind_offshore"=>12.66, "ng"=>1.25, "coal"=>1.0, "nuclear"=>0.902),
+        306 => Dict("load"=>1.33, "solar"=>2.03, "wind"=>1.11, "wind_offshore"=>12.66, "ng"=>1.25, "coal"=>1.0, "nuclear"=>0.902),
+        307 => Dict("load"=>1.25, "solar"=>2.03, "wind"=>1.11, "wind_offshore"=>12.66, "ng"=>1.25, "coal"=>1.0, "nuclear"=>0.902),
+        308 => Dict("load"=>1.66, "solar"=>2.33, "wind"=>1.11, "wind_offshore"=>12.66, "ng"=>1.25, "coal"=>1.0, "nuclear"=>0.902),
       ),
       2040 => Dict(
-        301 => Dict("load"=>3.18, "solar"=>8.38, "wind"=>3.67, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
-        302 => Dict("load"=>2.4, "solar"=>8.38, "wind"=>3.82, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
-        303 => Dict("load"=>2.09, "solar"=>8.38, "wind"=>3.23, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
-        304 => Dict("load"=>2.35, "solar"=>9.64, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
-        305 => Dict("load"=>2.74, "solar"=>9.22, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
-        306 => Dict("load"=>2.56, "solar"=>8.38, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
-        307 => Dict("load"=>2.4, "solar"=>8.38, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
-        308 => Dict("load"=>3.18, "solar"=>9.64, "wind"=>2.94, "wind_offshore"=>50.6, "ng"=>0.6, "coal"=>0.45, "nuclear"=>0.8),
+        301 => Dict("load"=>1.83, "solar"=>2.41, "wind"=>1.41, "wind_offshore"=>12.66, "ng"=>1.32, "coal"=>0.95, "nuclear"=>0.801),
+        302 => Dict("load"=>1.38, "solar"=>2.41, "wind"=>1.47, "wind_offshore"=>12.66, "ng"=>1.32, "coal"=>0.95, "nuclear"=>0.801),
+        303 => Dict("load"=>1.2, "solar"=>2.41, "wind"=>1.24, "wind_offshore"=>12.66, "ng"=>1.32, "coal"=>0.95, "nuclear"=>0.801),
+        304 => Dict("load"=>1.35, "solar"=>2.77, "wind"=>1.13, "wind_offshore"=>12.66, "ng"=>1.32, "coal"=>0.95, "nuclear"=>0.801),
+        305 => Dict("load"=>1.58, "solar"=>2.65, "wind"=>1.13, "wind_offshore"=>12.66, "ng"=>1.32, "coal"=>0.95, "nuclear"=>0.801),
+        306 => Dict("load"=>1.47, "solar"=>2.41, "wind"=>1.13, "wind_offshore"=>12.66, "ng"=>1.32, "coal"=>0.95, "nuclear"=>0.801),
+        307 => Dict("load"=>1.38, "solar"=>2.41, "wind"=>1.13, "wind_offshore"=>12.66, "ng"=>1.32, "coal"=>0.95, "nuclear"=>0.801),
+        308 => Dict("load"=>1.83, "solar"=>2.77, "wind"=>1.13, "wind_offshore"=>12.66, "ng"=>1.32, "coal"=>0.95, "nuclear"=>0.801),
       ),
       2045 => Dict(
-        301 => Dict("load"=>3.44, "solar"=>9.81, "wind"=>3.77, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
-        302 => Dict("load"=>2.59, "solar"=>9.81, "wind"=>3.93, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
-        303 => Dict("load"=>2.26, "solar"=>9.81, "wind"=>3.32, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
-        304 => Dict("load"=>2.54, "solar"=>11.28, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
-        305 => Dict("load"=>2.96, "solar"=>10.79, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
-        306 => Dict("load"=>2.76, "solar"=>9.81, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
-        307 => Dict("load"=>2.59, "solar"=>9.81, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
-        308 => Dict("load"=>3.44, "solar"=>11.28, "wind"=>3.02, "wind_offshore"=>50.6, "ng"=>0.61, "coal"=>0.45, "nuclear"=>0.8),
+        301 => Dict("load"=>2.03, "solar"=>2.81, "wind"=>1.45, "wind_offshore"=>12.66, "ng"=>1.4, "coal"=>0.9, "nuclear"=>0.801),
+        302 => Dict("load"=>1.53, "solar"=>2.81, "wind"=>1.51, "wind_offshore"=>12.66, "ng"=>1.4, "coal"=>0.9, "nuclear"=>0.801),
+        303 => Dict("load"=>1.33, "solar"=>2.81, "wind"=>1.28, "wind_offshore"=>12.66, "ng"=>1.4, "coal"=>0.9, "nuclear"=>0.801),
+        304 => Dict("load"=>1.49, "solar"=>3.23, "wind"=>1.16, "wind_offshore"=>12.66, "ng"=>1.4, "coal"=>0.9, "nuclear"=>0.801),
+        305 => Dict("load"=>1.74, "solar"=>3.09, "wind"=>1.16, "wind_offshore"=>12.66, "ng"=>1.4, "coal"=>0.9, "nuclear"=>0.801),
+        306 => Dict("load"=>1.63, "solar"=>2.81, "wind"=>1.16, "wind_offshore"=>12.66, "ng"=>1.4, "coal"=>0.9, "nuclear"=>0.801),
+        307 => Dict("load"=>1.53, "solar"=>2.81, "wind"=>1.16, "wind_offshore"=>12.66, "ng"=>1.4, "coal"=>0.9, "nuclear"=>0.801),
+        308 => Dict("load"=>2.03, "solar"=>3.23, "wind"=>1.16, "wind_offshore"=>12.66, "ng"=>1.4, "coal"=>0.9, "nuclear"=>0.801),
       ),
     ),
   ),
@@ -338,28 +344,6 @@ function write_config(simdir::String, year::Int, base_config::Dict; inv_dir=noth
     end
 end
 
-# ── Fast-run investment files (optional) ─────────────────────────────────────
-
-function write_fast_run(dir::String, ps_path::String)
-    ps = JSON.parsefile(ps_path)
-    mkpath(dir)
-    lrows = []
-    for i in 1:length(ps["branch"])
-        b = ps["branch"][string(i)]
-        fb, tb = ps["bus"][string(b["f_bus"])], ps["bus"][string(b["t_bus"])]
-        push!(lrows, (Branch_Index=i, Lat1=fb["lat"], Lon1=fb["lon"],
-                      Lat2=tb["lat"], Lon2=tb["lon"], Rate_A=b["rate_a"], Upgrade_Lvl=1.0))
-    end
-    CSV.write(joinpath(dir,"line_investments.csv"), DataFrame(lrows))
-    srows = []
-    for i in 1:length(ps["bus"])
-        bus = ps["bus"][string(i)]
-        push!(srows, (Node_Index=i, Node_Name=get(bus,"bus_name","BUS_$i"),
-                      Lat=bus["lat"], Lon=bus["lon"], Storage_Energy=12.0))
-    end
-    CSV.write(joinpath(dir,"storage_investments.csv"), DataFrame(srows))
-end
-
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 println("=== Scenario Generator (direct final ratios) ===")
@@ -381,12 +365,22 @@ if isdir(OUTPUT_DIR)
 end
 mkpath(OUTPUT_DIR)
 
-FAST_RUN_DIR = joinpath(OUTPUT_DIR, "fast_run_investments")
-if USE_FAST_RUN
-    write_fast_run(FAST_RUN_DIR, POWER_SYSTEM_DATA)
-    println("Wrote fast-run investment files.")
+# Validate the fixed-investment folder if one is configured
+inv_dir_abs = nothing
+if FIXED_INVESTMENT_DIR !== nothing
+    if isdir(FIXED_INVESTMENT_DIR)
+        needed = ["line_investments.csv", "storage_investments.csv"]
+        missing_files = [f for f in needed if !isfile(joinpath(FIXED_INVESTMENT_DIR, f))]
+        if isempty(missing_files)
+            inv_dir_abs = abspath(FIXED_INVESTMENT_DIR)
+            println("Fixed investments ENABLED -> $inv_dir_abs")
+        else
+            @warn "FIXED_INVESTMENT_DIR '$FIXED_INVESTMENT_DIR' is missing: $(join(missing_files, ", ")). Fixed investments DISABLED."
+        end
+    else
+        @warn "FIXED_INVESTMENT_DIR '$FIXED_INVESTMENT_DIR' not found. Fixed investments DISABLED."
+    end
 end
-
 generated = String[]
 for scenario in SCENARIOS
     println("\n── $(scenario.name): $(scenario.description)")
@@ -396,7 +390,7 @@ for scenario in SCENARIOS
         mkpath(joinpath(simdir, "output"))
         mkpath(joinpath(simdir, "visual"))
         write_ratios_json(simdir, scenario, year)
-        write_config(simdir, year, base_config; inv_dir = USE_FAST_RUN ? abspath(FAST_RUN_DIR) : nothing)
+        write_config(simdir, year, base_config; inv_dir = inv_dir_abs)
         println("   ✓ $year → $simdir")
         push!(generated, simdir)
         flush(stdout)

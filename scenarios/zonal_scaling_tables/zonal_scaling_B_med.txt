@@ -1,0 +1,108 @@
+==============================================================================
+SCENARIO RATIOS  —  B_MED
+==============================================================================
+Higher organic load growth (industrial + electrification), EIA-reference generation
+
+Each number = FINAL ratio vs 2022 baseline capacity/load.
+  1.00 = same as 2022    2.00 = double    0.80 = 80% (retirement)
+* = zone-specific override; unmarked = scenario default.
+Sources: ERCOT 2025 LTDEF | EIA AEO 2023 | NREL ATB 2024
+
+------------------------------------------------------------------------------
+  LOAD
+------------------------------------------------------------------------------
+Zone                                    2030      2035      2040      2045
+SCENARIO DEFAULT (all zones)            1.22      1.36      1.50      1.66
+301 Far West (Permian Basin)           1.49*     1.66*     1.83*     2.03*
+302 West (Lubbock/Wind Corridor)       1.12*     1.25*     1.38*     1.53*
+303 West/North (Abilene)               0.98*     1.09*     1.20*     1.33*
+304 South (Corpus Christi)             1.10*     1.22*     1.35*     1.49*
+305 South Central (Waco/Austin)        1.28*     1.43*     1.58*     1.74*
+306 South Central (San Antonio)        1.20*     1.33*     1.47*     1.63*
+307 Coast (Gulf Coast)                 1.12*     1.25*     1.38*     1.53*
+308 North Central (DFW)                1.49*     1.66*     1.83*     2.03*
+
+------------------------------------------------------------------------------
+  SOLAR
+------------------------------------------------------------------------------
+Zone                                    2030      2035      2040      2045
+SCENARIO DEFAULT (all zones)            4.51      5.80      6.87      8.04
+301 Far West (Permian Basin)           4.51*     5.80*     6.87*     8.04*
+302 West (Lubbock/Wind Corridor)       4.51*     5.80*     6.87*     8.04*
+303 West/North (Abilene)               4.51*     5.80*     6.87*     8.04*
+304 South (Corpus Christi)             5.19*     6.67*     7.90*     9.24*
+305 South Central (Waco/Austin)        4.96*     6.38*     7.56*     8.84*
+306 South Central (San Antonio)        4.51*     5.80*     6.87*     8.04*
+307 Coast (Gulf Coast)                 4.51*     5.80*     6.87*     8.04*
+308 North Central (DFW)                5.19*     6.67*     7.90*     9.24*
+
+------------------------------------------------------------------------------
+  WIND
+------------------------------------------------------------------------------
+Zone                                    2030      2035      2040      2045
+SCENARIO DEFAULT (all zones)            2.02      2.23      2.26      2.32
+301 Far West (Permian Basin)           2.52*     2.78*     2.83*     2.90*
+302 West (Lubbock/Wind Corridor)       2.62*     2.89*     2.94*     3.01*
+303 West/North (Abilene)               2.22*     2.45*     2.49*     2.55*
+304 South (Corpus Christi)             2.02*     2.23*     2.26*     2.32*
+305 South Central (Waco/Austin)        2.02*     2.23*     2.26*     2.32*
+306 South Central (San Antonio)        2.02*     2.23*     2.26*     2.32*
+307 Coast (Gulf Coast)                 2.02*     2.23*     2.26*     2.32*
+308 North Central (DFW)                2.02*     2.23*     2.26*     2.32*
+
+------------------------------------------------------------------------------
+  WIND_OFFSHORE
+------------------------------------------------------------------------------
+Zone                                    2030      2035      2040      2045
+SCENARIO DEFAULT (all zones)           21.63     50.63     50.63     50.63
+301 Far West (Permian Basin)          21.63*    50.63*    50.63*    50.63*
+302 West (Lubbock/Wind Corridor)      21.63*    50.63*    50.63*    50.63*
+303 West/North (Abilene)              21.63*    50.63*    50.63*    50.63*
+304 South (Corpus Christi)            21.63*    50.63*    50.63*    50.63*
+305 South Central (Waco/Austin)       21.63*    50.63*    50.63*    50.63*
+306 South Central (San Antonio)       21.63*    50.63*    50.63*    50.63*
+307 Coast (Gulf Coast)                21.63*    50.63*    50.63*    50.63*
+308 North Central (DFW)               21.63*    50.63*    50.63*    50.63*
+
+------------------------------------------------------------------------------
+  NG
+------------------------------------------------------------------------------
+Zone                                    2030      2035      2040      2045
+SCENARIO DEFAULT (all zones)            0.79      0.73      0.71      0.72
+301 Far West (Permian Basin)           0.79*     0.73*     0.71*     0.72*
+302 West (Lubbock/Wind Corridor)       0.79*     0.73*     0.71*     0.72*
+303 West/North (Abilene)               0.79*     0.73*     0.71*     0.72*
+304 South (Corpus Christi)             0.79*     0.73*     0.71*     0.72*
+305 South Central (Waco/Austin)        0.79*     0.73*     0.71*     0.72*
+306 South Central (San Antonio)        0.79*     0.73*     0.71*     0.72*
+307 Coast (Gulf Coast)                 0.79*     0.73*     0.71*     0.72*
+308 North Central (DFW)                0.79*     0.73*     0.71*     0.72*
+
+------------------------------------------------------------------------------
+  COAL
+------------------------------------------------------------------------------
+Zone                                    2030      2035      2040      2045
+SCENARIO DEFAULT (all zones)            0.82      0.82      0.82      0.82
+301 Far West (Permian Basin)           0.82*     0.82*     0.82*     0.82*
+302 West (Lubbock/Wind Corridor)       0.82*     0.82*     0.82*     0.82*
+303 West/North (Abilene)               0.82*     0.82*     0.82*     0.82*
+304 South (Corpus Christi)             0.82*     0.82*     0.82*     0.82*
+305 South Central (Waco/Austin)        0.82*     0.82*     0.82*     0.82*
+306 South Central (San Antonio)        0.82*     0.82*     0.82*     0.82*
+307 Coast (Gulf Coast)                 0.82*     0.82*     0.82*     0.82*
+308 North Central (DFW)                0.82*     0.82*     0.82*     0.82*
+
+------------------------------------------------------------------------------
+  NUCLEAR
+------------------------------------------------------------------------------
+Zone                                    2030      2035      2040      2045
+SCENARIO DEFAULT (all zones)            0.97      0.90      0.80      0.80
+301 Far West (Permian Basin)           0.97*     0.90*     0.80*     0.80*
+302 West (Lubbock/Wind Corridor)       0.97*     0.90*     0.80*     0.80*
+303 West/North (Abilene)               0.97*     0.90*     0.80*     0.80*
+304 South (Corpus Christi)             0.97*     0.90*     0.80*     0.80*
+305 South Central (Waco/Austin)        0.97*     0.90*     0.80*     0.80*
+306 South Central (San Antonio)        0.97*     0.90*     0.80*     0.80*
+307 Coast (Gulf Coast)                 0.97*     0.90*     0.80*     0.80*
+308 North Central (DFW)                0.97*     0.90*     0.80*     0.80*
+
