@@ -33,8 +33,99 @@ Output:
 
 using Plots
 using JSON
+using Colors
 
 SCENARIO_LABEL = ""  # set in main() from the simdir path
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FIXED FUEL COLORS
+# ═══════════════════════════════════════════════════════════════════════════════
+# Per meeting notes 8/12: pie chart and stacked plots must use the SAME color
+# for the same resource. Plots.jl otherwise assigns colors by series ORDER, so
+# a fuel that appears in a different position between charts gets a different
+# color (this is why solar and coal looked swapped between the pie and stack).
+# Mapping each fuel name to an explicit hex code fixes the color to the
+# resource, not to its position.
+
+const FUEL_COLORS = Dict(
+    "nuclear"           => colorant"#7B68EE",   # purple
+    "coal"              => colorant"#5A4632",   # dark brown
+    "ng"                => colorant"#E4572E",   # orange-red
+    "hydro"             => colorant"#2E86AB",   # blue
+    "solar"             => colorant"#F4C430",   # yellow/gold
+    "wind"              => colorant"#3BB273",   # green
+    "wind_offshore"     => colorant"#1B998B",   # teal
+    "storage_discharge" => colorant"#9B5DE5",   # violet
+    "storage_charge"    => colorant"#C77DFF",   # light violet
+)
+
+const FALLBACK_COLOR = colorant"#999999"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FIGURE CAPTIONS
+# ═══════════════════════════════════════════════════════════════════════════════
+# Each figure carries a short title above and an explanatory caption below, so
+# it can be read on its own without surrounding text (research-paper style).
+
+"""
+    wrap_text(s, width) -> String
+
+Hard-wrap a caption at `width` characters on word boundaries.
+"""
+function wrap_text(s::AbstractString, width::Int=110)
+    words = split(s)
+    lines = String[]
+    cur = ""
+    for w in words
+        if isempty(cur)
+            cur = w
+        elseif length(cur) + 1 + length(w) <= width
+            cur *= " " * w
+        else
+            push!(lines, cur); cur = w
+        end
+    end
+    !isempty(cur) && push!(lines, cur)
+    return join(lines, "\n")
+end
+
+"""
+    with_caption(p, caption; height=0.14) -> Plot
+
+Stack a plot above a text-only panel holding the figure caption.
+"""
+function with_caption(p, caption::AbstractString; height::Float64=0.14)
+    txt = wrap_text(caption)
+    cappanel = plot(framestyle=:none, showaxis=false, grid=false,
+                    ticks=nothing, legend=false)
+    annotate!(cappanel, 0.0, 0.5, text(txt, 8, :left, :vcenter, "Helvetica"))
+    xlims!(cappanel, 0, 1); ylims!(cappanel, 0, 1)
+    return plot(p, cappanel, layout=grid(2, 1, heights=[1 - height, height]))
+end
+
+
+"""
+    fuel_color(name) -> Color
+
+Look up the fixed color for a fuel type. Falls back to grey for anything
+not in the map (so a new fuel never silently steals another's color).
+Handles the "<fuel> (capacity ceiling)" labels used in the pre-solve plot.
+"""
+function fuel_color(name)
+    s = string(name)
+    # strip the "(capacity ceiling)" suffix used by the pre-solve stack
+    s = replace(s, r"\s*\(capacity ceiling\)$" => "")
+    return get(FUEL_COLORS, s, FALLBACK_COLOR)
+end
+
+"""
+    colors_for(names) -> row vector of Colors
+
+Build the `seriescolor` argument for a set of series, in order.
+"""
+colors_for(names) = reshape([fuel_color(n) for n in names], 1, length(names))
+
+
 using CSV
 using DataFrames
 
@@ -68,8 +159,18 @@ function plot_capacity_pie(data, output_path)
     end
 
     p = pie(labels, values_,
-            title="[MODEL INPUT] Installed Capacity by Fuel Type — $SCENARIO_LABEL\n(pmax MW, scaled capacity fed into the model)",
+            seriescolor=colors_for(labels),
+            title="Installed Capacity by Fuel Type — $SCENARIO_LABEL", titlefontsize=10,
             legend=:outertopright)
+
+    total_gw = sum(values_) / 1000
+    cap = "Installed generation capacity by fuel type for scenario $SCENARIO_LABEL, after " *
+          "scenario scaling is applied to the 2022 baseline. Values are nameplate maximum " *
+          "output (pmax), not energy produced; a large capacity share does not imply a large " *
+          "generation share, since wind and solar operate well below nameplate most hours. " *
+          "Total installed capacity is $(round(total_gw, digits=1)) GW."
+    p = with_caption(p, cap)
+
     savefig(p, output_path)
     println("Saved pie chart to $output_path")
     return p
@@ -139,11 +240,12 @@ function plot_daily_stacked(data, rep_index, output_path)
     # of the stack gives a stable foundation and makes the variable renewable
     # layers above them readable. Order: nuclear -> coal -> other thermal ->
     # renewables on top.
-    baseload_names = ["nuclear", "coal"]
-    baseload_types = [t for t in active_nonrenewables if string(t) in baseload_names]
-    sort!(baseload_types, by = t -> findfirst(==(string(t)), baseload_names))
-    other_thermal  = sort([t for t in active_nonrenewables if !(string(t) in baseload_names)], by = string)
-    active_nonrenewables = vcat(baseload_types, other_thermal)
+    # Explicit stack order (per meeting notes 8/12): baseload at the bottom,
+    # then dispatchable thermal, then variable renewables (solar before wind).
+    STACK_ORDER = ["nuclear", "coal", "ng", "hydro", "solar", "wind", "wind_offshore"]
+    order_rank(t) = something(findfirst(==(string(t)), STACK_ORDER), length(STACK_ORDER) + 1)
+    active_nonrenewables = sort(active_nonrenewables, by = order_rank)
+    active_renewables    = sort(active_renewables,    by = order_rank)
 
     if isempty(active_renewables) && isempty(active_nonrenewables)
         println("Warning: no nonzero generation found for rep_index=$rep_index")
@@ -170,12 +272,22 @@ function plot_daily_stacked(data, rep_index, output_path)
 
     p = areaplot(hours, gen_matrix,
                  label=reshape(gen_labels, 1, length(gen_labels)),
-                 title="[MODEL INPUT] Available Capacity vs. Load — $SCENARIO_LABEL, Rep. Day $rep_index\n(Pre-solve: renewable profiles + nonrenewable pmax ceiling vs scaled load)",
-                 xlabel="Hour", ylabel="Power (MW)",
+                 seriescolor=colors_for(gen_labels),
+                 title="Available Capacity vs. Load — $SCENARIO_LABEL, Day $rep_index", titlefontsize=10,
+                 xlabel="Hour of representative day", ylabel="Power (MW)",
                  legend=:outertopright)
 
     plot!(p, hours, total_load,
           label="Total Load", linewidth=3, linecolor=:black, linestyle=:dash)
+
+    cap = "Model input for scenario $SCENARIO_LABEL: available generation capacity against " *
+          "system load over one representative day. Wind, solar and hydro layers show the " *
+          "hourly resource profile actually available; thermal layers (nuclear, coal, gas) " *
+          "show the nameplate ceiling rather than dispatch, since commitment is decided by " *
+          "the optimizer. Baseload sits at the bottom of the stack, variable renewables above. " *
+          "The dashed line is total system load. This figure precedes the solve and shows what " *
+          "the optimizer has to work with, not what it chose."
+    p = with_caption(p, cap, height=0.18)
 
     savefig(p, output_path)
     println("Saved stacked profile plot to $output_path")
@@ -219,14 +331,69 @@ function plot_actual_dispatch(simdir, data, rep_index, output_path)
     # Nuclear and coal run flat around the clock, so they form a stable base
     # for the stack; variable renewables layer on top where their shape is
     # readable against a steady foundation.
-    baseload_names = ["nuclear", "coal"]
-    baseload_types = [t for t in active_types if string(t) in baseload_names]
-    sort!(baseload_types, by = t -> findfirst(==(string(t)), baseload_names))
-    other_types    = sort([t for t in active_types if !(string(t) in baseload_names)], by = string)
-    active_types   = vcat(baseload_types, other_types)
+    # Explicit stack order (per meeting notes 8/12): baseload at the bottom,
+    # then dispatchable thermal, then variable renewables with solar before
+    # wind. Alphabetical sorting previously put wind before solar.
+    STACK_ORDER = ["nuclear", "coal", "ng", "hydro", "solar", "wind", "wind_offshore"]
+    order_rank(t) = something(findfirst(==(string(t)), STACK_ORDER), length(STACK_ORDER) + 1)
+    active_types = sort(active_types, by = order_rank)
 
     BASE_POWER = 100.0
-    dispatch_matrix = hcat([grouped[!, Symbol(gt)] .* BASE_POWER for gt in active_types]...)
+
+    # ── Storage (per meeting notes 8/12) ─────────────────────────────────────
+    # The power balance the model enforces is:
+    #     generation + storage_discharge - storage_charge = load + load_shed
+    # Plotting only generation makes storage arbitrage LOOK like load shed:
+    # surplus in off-peak hours (charging) reads as overbuild, and the evening
+    # peak (discharging) reads as an unserved gap. Adding discharge as a layer
+    # on top of generation, and charge as a NEGATIVE layer below the axis,
+    # makes the stack close on the load line so any remaining gap is REAL
+    # load shed.
+    #
+    # Column names vary by codebase version, so we search a few candidates.
+    discharge_cols = ["discharge", "dis", "storage_discharge", "Discharge"]
+    charge_cols    = ["charge", "ch", "storage_charge", "Charge"]
+
+    find_col(cands) = findfirst(x -> x in df_col_names, cands)
+
+    dis_idx = find_col(discharge_cols)
+    ch_idx  = find_col(charge_cols)
+
+    discharge_series = nothing
+    charge_series    = nothing
+
+    if dis_idx !== nothing
+        colname = discharge_cols[dis_idx]
+        g = combine(groupby(df, :Hour), Symbol(colname) => sum => :d)
+        sort!(g, :Hour)
+        if sum(g.d) > 0
+            discharge_series = g.d .* BASE_POWER
+        end
+    end
+    if ch_idx !== nothing
+        colname = charge_cols[ch_idx]
+        g = combine(groupby(df, :Hour), Symbol(colname) => sum => :c)
+        sort!(g, :Hour)
+        if sum(g.c) > 0
+            charge_series = g.c .* BASE_POWER
+        end
+    end
+
+    if dis_idx === nothing && ch_idx === nothing
+        @warn "No storage columns found in energy.csv (looked for $(discharge_cols) / $(charge_cols)). " *
+              "Any gap between the generation stack and the load line may be storage, not load shed."
+    end
+
+    # Build the stack: generation types, then storage discharge on top
+    stack_series = [grouped[!, Symbol(gt)] .* BASE_POWER for gt in active_types]
+    stack_labels = [string(gt) for gt in active_types]
+
+    if discharge_series !== nothing
+        push!(stack_series, discharge_series)
+        push!(stack_labels, "storage_discharge")
+    end
+
+    dispatch_matrix = hcat(stack_series...)
 
     # Real load, same as before, pulled from the data pipeline (not from energy.csv)
     num_h = data["param"]["num_hours"]
@@ -239,13 +406,34 @@ function plot_actual_dispatch(simdir, data, rep_index, output_path)
     end
 
     p = areaplot(hours, dispatch_matrix,
-                 label=reshape(string.(active_types), 1, length(active_types)),
-                 title="[SOLVED OUTPUT] Actual Dispatch — $SCENARIO_LABEL, Rep. Day $rep_index\n(Real pg from the solved model, energy.csv)",
-                 xlabel="Hour", ylabel="Power (MW)",
+                 label=reshape(string.(stack_labels), 1, length(stack_labels)),
+                 seriescolor=colors_for(stack_labels),
+                 title="Actual Dispatch — $SCENARIO_LABEL, Day $rep_index", titlefontsize=10,
+                 xlabel="Hour of representative day", ylabel="Power (MW)",
                  legend=:outertopright)
 
     plot!(p, hours, total_load,
           label="Total Load", linewidth=3, linecolor=:black, linestyle=:dash)
+
+    # Storage charging drawn BELOW the axis -- it's load the grid is serving,
+    # so showing it as negative keeps the visual power balance honest.
+    if charge_series !== nothing
+        plot!(p, hours, -charge_series,
+              seriestype=:line, fillrange=0, fillalpha=0.55,
+              fillcolor=fuel_color("storage_charge"),
+              linecolor=fuel_color("storage_charge"), linewidth=1,
+              label="storage_charge (negative)")
+    end
+
+    peak_load = maximum(total_load)
+    shed_note = "Generation plus storage discharge should meet the load line exactly; any " *
+                "visible gap is unserved load."
+    cap = "Solved dispatch for scenario $SCENARIO_LABEL over one representative day. Each layer " *
+          "is actual generation from the optimizer (pg), with storage discharge stacked on top " *
+          "and storage charging drawn below the axis as it is load the grid must serve. " *
+          "Baseload runs flat at the bottom; variable renewables layer above. Peak load is " *
+          "$(round(peak_load/1000, digits=1)) GW. " * shed_note
+    p = with_caption(p, cap, height=0.18)
 
     savefig(p, output_path)
     println("Saved actual dispatch plot to $output_path")

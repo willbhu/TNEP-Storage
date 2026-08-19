@@ -23,6 +23,21 @@ import os
 import numpy as np
 import plotly.graph_objects as go
 
+
+# ── Figure caption ────────────────────────────────────────────────────────────
+def add_caption(fig, text, bottom_margin=95):
+    """Attach an explanatory caption beneath the plot area (paper style)."""
+    fig.add_annotation(
+        text=text, xref="paper", yref="paper",
+        x=0, y=-0.06, xanchor="left", yanchor="top",
+        showarrow=False, align="left",
+        font=dict(size=11, color="#333333"),
+    )
+    m = fig.layout.margin
+    fig.update_layout(margin=dict(l=m.l or 0, r=m.r or 0, t=m.t or 60, b=bottom_margin))
+    return fig
+
+
 # ── Args ──────────────────────────────────────────────────────────────────────
 simdir    = sys.argv[1]
 _parts = os.path.normpath(simdir).split(os.sep)
@@ -140,12 +155,18 @@ fig.update_geos(
 
 fig.update_layout(
     title=dict(
-        text=f"[MODEL INPUT] 24-Hour Integrated Load per Bus — Scenario {scenario_label} ({date_label})<br>"
+        text=f"24-Hour Integrated Load per Bus — {scenario_label} ({date_label})<br>"
              f"<sup>Scaled load fed INTO the model (from data.json). Size/color = total MWh over the day.</sup>",
         font=dict(size=18)
     ),
     margin=dict(l=0, r=0, t=60, b=0)
 )
+
+add_caption(fig,
+    f"Total electricity consumed at each bus over the 24 hours of representative day "
+    f"{date_label}, for scenario {scenario_label}. Circle size and colour both encode daily "
+    f"energy in MWh. This is model input — the scaled load fed into the optimizer — and shows "
+    f"where demand is geographically concentrated. Grey lines are transmission branches.")
 
 visual_dir = os.path.join(out_dir, "visual")
 os.makedirs(visual_dir, exist_ok=True)

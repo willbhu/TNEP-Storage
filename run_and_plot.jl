@@ -29,6 +29,7 @@ const PYTHON_EXE = raw"C:\Users\willi\AppData\Local\Python\pythoncore-3.14-64\py
 # Paths to the Python plotting scripts (relative to project root)
 const PY_INTEGRATED_LOAD = "viz/tamu/topology/plot_integrated_load.py"
 const PY_INVESTMENTS      = "viz/tamu/topology/plot_investments.py"
+const PY_STORAGE_UTIL     = "viz/tamu/topology/plot_storage_utilization.py"
 
 # Rep-day index to plot (1 = first date in the scenario's `dates` list)
 const PLOT_REP_INDEX = 1
@@ -80,6 +81,25 @@ function run_and_plot(simdir::String; solve::Bool=true, rep_index::Int=PLOT_REP_
     flush(stdout)
     run_python(PY_INVESTMENTS, simdir)
 
+    # ── 5. Storage utilization geo plot (Python) ──────────────────────────────
+    println("\n" * "="^70)
+    println("GENERATING STORAGE UTILIZATION PLOT (Python)")
+    println("="^70)
+    flush(stdout)
+    run_python(PY_STORAGE_UTIL, simdir)
+
+    # ── 6. Report solved parameters ───────────────────────────────────────────
+    println("\n" * "="^70)
+    println("SCENARIO REPORT")
+    println("="^70)
+    flush(stdout)
+    try
+        isdefined(Main, :report_summary) || include("report_summary.jl")
+        Base.invokelatest(report_summary, simdir)
+    catch e
+        @warn "Summary report failed" exception=e
+    end
+
     # ── Summary ───────────────────────────────────────────────────────────────
     println("\n" * "="^70)
     println("DONE. Plots written to $simdir/visual/ :")
@@ -87,6 +107,8 @@ function run_and_plot(simdir::String; solve::Bool=true, rep_index::Int=PLOT_REP_
     println("  actual_dispatch_stacked.png")
     println("  integrated_load_geo.html")
     println("  investments_geo.html")
+    println("  storage_utilization_geo.html")
+    println("  storage_utilization.csv")
     println("="^70)
     flush(stdout)
 

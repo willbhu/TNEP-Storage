@@ -76,20 +76,24 @@ using DataFrames
 using JSON
 using TOML
 
-const DATA_CENTER_MW = 500.0
-const BASE_POWER     = 100.0
-const POWER_SYSTEM_DATA = "data/topology/tamu/texas/power_system_data.json"
-const SCEN_DIR = "scenarios"
+# NOTE: names are prefixed DC_ to avoid colliding with globals that
+# generate_scenarios.jl already defines (DC_POWER_SYSTEM, DC_ZONE_NAMES, ...),
+# so both scripts can be included in the same Julia session.
 
-const HOTSPOT_WEIGHTS = Dict(
+DC_MW_PER_CENTER = 500.0
+DC_BASE_POWER    = 100.0
+DC_POWER_SYSTEM  = "data/topology/tamu/texas/power_system_data.json"
+DC_SCEN_DIR      = "scenarios"
+
+DC_HOTSPOT_WEIGHTS = Dict(
     308 => 0.40, 305 => 0.25, 307 => 0.12, 303 => 0.12, 301 => 0.11,
 )
 
-const DATA_CENTER_COUNTS = Dict(
+DC_COUNTS = Dict(
     "A_low" => 0, "B_med" => 40, "C_fossil" => 80,
 )
 
-const ZONE_NAMES = Dict(
+DC_ZONE_NAMES = Dict(
     301 => "Far West (Permian Basin)", 302 => "West (Lubbock)",
     303 => "West/North (Abilene)", 304 => "South (Corpus Christi)",
     305 => "South Central (Waco/Austin)", 306 => "South Central (San Antonio)",
@@ -99,7 +103,7 @@ const ZONE_NAMES = Dict(
 # ── Load zone map + per-bus baseline load from power_system_data.json ─────────
 
 function load_grid_info()
-    ps = JSON.parsefile(POWER_SYSTEM_DATA)
+    ps = JSON.parsefile(DC_POWER_SYSTEM)
     zone_map = Dict{Int,Int}()
     bus_load = Dict{Int,Float64}()   # baseline Pd per bus (proxy for "big load bus")
     bus_ll   = Dict{Int,Tuple{Float64,Float64}}()
@@ -115,11 +119,11 @@ end
 # ── Decide placement: bus_id => added_MW ─────────────────────────────────────
 
 function plan_placement(scenario_name::String, zone_map, bus_load)
-    count = get(DATA_CENTER_COUNTS, scenario_name, 0)
+    count = get(DC_COUNTS, scenario_name, 0)
     placement = Dict{Int,Float64}()
     count == 0 && return placement
 
-    for (zone_id, weight) in HOTSPOT_WEIGHTS
+    for (zone_id, weight) in DC_HOTSPOT_WEIGHTS
         n = round(Int, count * weight)
         n == 0 && continue
         zbuses = [(b, bus_load[b]) for b in keys(bus_load) if get(zone_map, b, -1) == zone_id]
@@ -127,7 +131,7 @@ function plan_placement(scenario_name::String, zone_map, bus_load)
         sort!(zbuses, by = x -> x[2], rev = true)
         for i in 1:n
             b = zbuses[mod1(i, length(zbuses))][1]
-            placement[b] = get(placement, b, 0.0) + DATA_CENTER_MW
+            placement[b] = get(placement, b, 0.0) + DC_MW_PER_CENTER
         end
     end
     return placement
@@ -154,8 +158,8 @@ function add_data_centers_to(simdir::String; mode::Symbol = :sidecar)
     for (bid, mw) in sort(collect(placement); by = x -> x[1])
         lat, lon = bus_ll[bid]
         push!(rows, (Bus=bid, Zone=zone_map[bid],
-                     Zone_Name=get(ZONE_NAMES, zone_map[bid], "?"),
-                     Added_MW=mw, N_Centers=round(Int, mw/DATA_CENTER_MW),
+                     Zone_Name=get(DC_ZONE_NAMES, zone_map[bid], "?"),
+                     Added_MW=mw, N_Centers=round(Int, mw/DC_MW_PER_CENTER),
                      Lat=lat, Lon=lon))
     end
     df = DataFrame(rows)
@@ -170,7 +174,7 @@ function add_data_centers_to(simdir::String; mode::Symbol = :sidecar)
     end
 
     # mode == :sidecar : create a _dc twin simdir
-    dc_scen_dir = joinpath(SCEN_DIR, scen * "_dc", year)
+    dc_scen_dir = joinpath(DC_SCEN_DIR, scen * "_dc", year)
     mkpath(joinpath(dc_scen_dir, "output"))
     mkpath(joinpath(dc_scen_dir, "visual"))
 
@@ -190,12 +194,12 @@ function add_data_centers_to(simdir::String; mode::Symbol = :sidecar)
     end
 
     # Write the sidecar load file: bus_id => added per-unit load (flat)
-    load_pu = Dict(string(bid) => mw / BASE_POWER for (bid, mw) in placement)
+    load_pu = Dict(string(bid) => mw / DC_BASE_POWER for (bid, mw) in placement)
     open(joinpath(dc_scen_dir, "data_center_load.json"), "w") do io
         JSON.print(io, Dict(
             "scenario" => scen,
             "year" => year,
-            "mw_per_center" => DATA_CENTER_MW,
+            "mw_per_center" => DC_MW_PER_CENTER,
             "total_mw" => isempty(placement) ? 0.0 : sum(values(placement)),
             "note" => "flat 24/7 load added per bus, in per-unit (MW/100)",
             "bus_added_pu" => load_pu,
@@ -212,13 +216,13 @@ end
 
 function add_data_centers_to_all(; mode::Symbol = :sidecar)
     println("=== Adding data centers to scenarios (mode=$mode) ===")
-    isdir(SCEN_DIR) || error("No $SCEN_DIR/ directory. Run generate_scenarios.jl first.")
+    isdir(DC_SCEN_DIR) || error("No $DC_SCEN_DIR/ directory. Run generate_scenarios.jl first.")
 
     made = String[]
-    for scen in readdir(SCEN_DIR)
+    for scen in readdir(DC_SCEN_DIR)
         # skip helper dirs and already-made _dc twins
         (startswith(scen, "zonal_") || startswith(scen, "fast_run") || endswith(scen, "_dc")) && continue
-        scen_path = joinpath(SCEN_DIR, scen)
+        scen_path = joinpath(DC_SCEN_DIR, scen)
         isdir(scen_path) || continue
         for year in readdir(scen_path)
             simdir = joinpath(scen_path, year)

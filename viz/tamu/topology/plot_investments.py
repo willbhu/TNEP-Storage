@@ -26,8 +26,26 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 
+
+# ── Figure caption ────────────────────────────────────────────────────────────
+def add_caption(fig, text, bottom_margin=95):
+    """Attach an explanatory caption beneath the plot area (paper style)."""
+    fig.add_annotation(
+        text=text, xref="paper", yref="paper",
+        x=0, y=-0.06, xanchor="left", yanchor="top",
+        showarrow=False, align="left",
+        font=dict(size=11, color="#333333"),
+    )
+    m = fig.layout.margin
+    fig.update_layout(margin=dict(l=m.l or 0, r=m.r or 0, t=m.t or 60, b=bottom_margin))
+    return fig
+
+
 # ── Args ──────────────────────────────────────────────────────────────────────
 simdir = sys.argv[1]
+# Build a readable scenario label from the path, e.g. "B_med / 2030"
+_parts = os.path.normpath(simdir).split(os.sep)
+scenario_label = " / ".join(_parts[-2:]) if len(_parts) >= 2 else os.path.basename(simdir)
 
 # ── Resolve paths regardless of where script is run from ─────────────────────
 candidates = [
@@ -187,10 +205,10 @@ fig.update_geos(
 fig.update_layout(
     title=dict(
         text=(
-            f"TEP+Storage Investment Decisions — {os.path.basename(simdir)}<br>"
+            f"Investment Decisions — {scenario_label}<br>"
             f"<sup>{n_upgraded} line upgrades | "
             f"{n_storage} storage nodes | "
-            f"{total_mwh:.1f} MWh total storage</sup>"
+            f"{total_mwh:.1f} MWh total storage — from line/storage_investments.csv</sup>"
         ),
         font=dict(size=18)
     ),
@@ -204,6 +222,14 @@ fig.update_layout(
 
 visual_dir = os.path.join(out_dir, "visual")
 os.makedirs(visual_dir, exist_ok=True)
+add_caption(fig,
+    f"Transmission and storage investment decisions from the solved model for scenario "
+    f"{scenario_label}. Red lines are branches selected for upgrade, with thickness scaled to "
+    f"upgrade level; green circles are nodes where storage was sited, sized by installed energy "
+    f"capacity in MWh. Grey lines are branches left unchanged. Totals: {n_upgraded} line "
+    f"upgrades and {total_mwh:,.0f} MWh of storage across {n_storage} nodes. Where investments "
+    f"were fixed as model input rather than optimized, this map reflects those fixed values.")
+
 out_path = os.path.join(visual_dir, "investments_geo.html")
 fig.write_html(out_path)
 print(f"\nSaved to {out_path}")

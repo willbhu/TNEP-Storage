@@ -130,6 +130,34 @@ function update_decarbonization(simdir, data)
         end
     end
 
+    # ── Data-center nodal load ────────────────────────────────────────────────
+    # Written by add_data_centers.jl into the <scenario>_dc twin folders.
+    # Data centers are modeled as NODAL growth: fixed-MW blocks of flat 24/7
+    # load at specific buses, added ON TOP of the scaled zonal load. This is
+    # inert for base scenarios (data_centers is absent/false in their config),
+    # so only the _dc twins are affected.
+    if get(toml_data, "data_centers", false) && haskey(toml_data, "data_center_load_file")
+        dcf = toml_data["data_center_load_file"]
+        if isfile(dcf)
+            dc_added = JSON.parsefile(dcf)["bus_added_pu"]
+            n_buses = 0
+            total_pu = 0.0
+            for (bid, add_pu) in dc_added
+                haskey(data["bus"], bid) || continue
+                add = Float64(add_pu)
+                for (rep, prof) in data["bus"][bid]["load"]
+                    data["bus"][bid]["load"][rep] = prof .+ add
+                end
+                n_buses += 1
+                total_pu += add
+            end
+            println("  Data centers: added $(round(total_pu * 100, digits=0)) MW " *
+                    "across $n_buses buses (flat 24/7)")
+        else
+            @warn "data_centers enabled but load file not found: $dcf"
+        end
+    end
+
     return data
 end
 
