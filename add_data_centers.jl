@@ -90,7 +90,7 @@ DC_HOTSPOT_WEIGHTS = Dict(
 )
 
 DC_COUNTS = Dict(
-    "A_low" => 0, "B_med" => 40, "C_fossil" => 80,
+    "A_low" => 0, "B_med" => 50, "C_fossil" => 50,
 )
 
 DC_ZONE_NAMES = Dict(
