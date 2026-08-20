@@ -1,11 +1,11 @@
 
-Gurobi 11.0.3 (win64) logging started Tue Aug 18 23:02:09 2026
+Gurobi 11.0.3 (win64) logging started Wed Aug 19 22:20:00 2026
 
 Set parameter LogFile to value "scenarios/B_med_dc/2030\gurobi_logfile.log"
 Set parameter MIPGap to value 0.01
 Set parameter TimeLimit to value 84600
 
-Gurobi 11.0.3 (win64) logging started Tue Aug 18 23:02:09 2026
+Gurobi 11.0.3 (win64) logging started Wed Aug 19 22:20:00 2026
 
 Set parameter LogFile to value "scenarios/B_med_dc/2030\gurobi_logfile.log"
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
@@ -24,7 +24,7 @@ Warning: Model contains large objective coefficients
          Consider reformulating model or setting NumericFocus parameter
          to avoid numerical issues.
 Presolve removed 153206 rows and 65166 columns
-Presolve time: 0.16s
+Presolve time: 0.21s
 Presolved: 48024 rows, 146392 columns, 288392 nonzeros
 
 Concurrent LP optimizer: primal simplex, dual simplex, and barrier
@@ -32,13 +32,7 @@ Showing barrier log only...
 
 Ordering time: 0.00s
 
-Barrier statistics:
- AA' NZ     : 4.700e+01
- Factor NZ  : 6.660e+02 (roughly 2 MB of memory)
- Factor Ops : 1.252e+04 (less than 1 second per iteration)
- Threads    : 1
-
-Barrier performed 0 iterations in 0.19 seconds (0.29 work units)
+Barrier performed 0 iterations in 0.26 seconds (0.29 work units)
 Barrier solve interrupted - model solved by another algorithm
 
 
@@ -56,10 +50,10 @@ Crossover log...
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
       27    5.8876747e+11   0.000000e+00   0.000000e+00      0s
 
-Solved in 27 iterations and 0.34 seconds (0.38 work units)
+Solved in 27 iterations and 0.42 seconds (0.38 work units)
 Optimal objective  5.887674679e+11
 
-User-callback calls 118, time in user-callback 0.00 sec
+User-callback calls 111, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -80,7 +74,7 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.8876747e+11   1.928060e+02   0.000000e+00      0s
       51    5.8897034e+11   0.000000e+00   0.000000e+00      0s
 
-Solved in 51 iterations and 0.10 seconds (0.10 work units)
+Solved in 51 iterations and 0.13 seconds (0.10 work units)
 Optimal objective  5.889703363e+11
 
 User-callback calls 76, time in user-callback 0.00 sec
@@ -128,7 +122,7 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.8903432e+11   3.160222e+01   0.000000e+00      0s
       41    5.8906551e+11   0.000000e+00   0.000000e+00      0s
 
-Solved in 41 iterations and 0.10 seconds (0.10 work units)
+Solved in 41 iterations and 0.13 seconds (0.10 work units)
 Optimal objective  5.890655064e+11
 
 User-callback calls 66, time in user-callback 0.00 sec
@@ -152,7 +146,7 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.8906551e+11   1.804806e+01   0.000000e+00      0s
       64    5.8908391e+11   0.000000e+00   0.000000e+00      0s
 
-Solved in 64 iterations and 0.14 seconds (0.17 work units)
+Solved in 64 iterations and 0.18 seconds (0.17 work units)
 Optimal objective  5.890839122e+11
 
 User-callback calls 89, time in user-callback 0.00 sec
@@ -176,7 +170,7 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.8908391e+11   8.973480e+00   0.000000e+00      0s
       44    5.8909392e+11   0.000000e+00   0.000000e+00      0s
 
-Solved in 44 iterations and 0.13 seconds (0.17 work units)
+Solved in 44 iterations and 0.16 seconds (0.17 work units)
 Optimal objective  5.890939166e+11
 
 User-callback calls 69, time in user-callback 0.00 sec
@@ -224,7 +218,7 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.8909584e+11   3.003788e-03   0.000000e+00      0s
        2    5.8909584e+11   0.000000e+00   0.000000e+00      0s
 
-Solved in 2 iterations and 0.15 seconds (0.16 work units)
+Solved in 2 iterations and 0.14 seconds (0.16 work units)
 Optimal objective  5.890958373e+11
 
 User-callback calls 27, time in user-callback 0.00 sec

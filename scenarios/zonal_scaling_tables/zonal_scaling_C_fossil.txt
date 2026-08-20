@@ -1,12 +1,23 @@
 ==============================================================================
-SCENARIO RATIOS  —  C_FOSSIL
+TABLE — SCENARIO SCALING RATIOS: C_FOSSIL
 ==============================================================================
 Same load as B, FOSSIL-HEAVY generation — solar 35% / wind 50% of EIA, gas grows, coal held
 
-Each number = FINAL ratio vs 2022 baseline capacity/load.
-  1.00 = same as 2022    2.00 = double    0.80 = 80% (retirement)
-* = zone-specific override; unmarked = scenario default.
-Sources: ERCOT 2025 LTDEF | EIA AEO 2023 | NREL ATB 2024
+Scaling ratios applied to each fuel type and load in each ERCOT weather
+zone of the 2000-bus synthetic Texas system, for planning years 2030, 2035, 2040, 2045.
+
+HOW TO READ:
+  Each value is the FINAL ratio relative to the 2022 baseline, i.e.
+      future_capacity = ratio x 2022_capacity
+  1.00 = unchanged from 2022   2.00 = doubled   0.80 = 20% retired
+  Values are applied per bus according to that bus's zone_id.
+  Rows marked * carry a zone-specific value; unmarked rows inherit the
+  scenario default shown in the first row of each block.
+
+Load ratios are derived from ERCOT long-term load forecasts; generation
+ratios from EIA Annual Energy Outlook projections adjusted per scenario.
+Data-center demand is NOT included here — it is modeled separately as
+nodal load in the corresponding _dc scenario variants.
 
 ------------------------------------------------------------------------------
   LOAD

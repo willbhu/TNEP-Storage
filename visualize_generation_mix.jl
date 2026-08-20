@@ -95,12 +95,19 @@ end
 Stack a plot above a text-only panel holding the figure caption.
 """
 function with_caption(p, caption::AbstractString; height::Float64=0.14)
-    txt = wrap_text(caption)
-    cappanel = plot(framestyle=:none, showaxis=false, grid=false,
-                    ticks=nothing, legend=false)
-    annotate!(cappanel, 0.0, 0.5, text(txt, 8, :left, :vcenter, "Helvetica"))
-    xlims!(cappanel, 0, 1); ylims!(cappanel, 0, 1)
-    return plot(p, cappanel, layout=grid(2, 1, heights=[1 - height, height]))
+    try
+        txt = wrap_text(caption)
+        cappanel = plot(framestyle=:none, showaxis=false, grid=false,
+                        ticks=nothing, legend=false)
+        xlims!(cappanel, 0, 1); ylims!(cappanel, 0, 1)
+        annotate!(cappanel, 0.02, 0.5, text(txt, 8, :left, :vcenter))
+        return plot(p, cappanel,
+                    layout = grid(2, 1, heights=[1 - height, height]),
+                    size = (1000, 700))
+    catch e
+        @warn "Caption panel failed; saving figure without caption." exception=e
+        return p
+    end
 end
 
 
@@ -158,8 +165,19 @@ function plot_capacity_pie(data, output_path)
         end
     end
 
+    # A pie is ONE series with N slices, so seriescolor (which is per-series)
+    # collapses every slice to a single colour. Passing an ordered palette
+    # assigns colours slice by slice instead.
+    slice_colors = [fuel_color(l) for l in labels]
+    pie_palette = try
+        palette(slice_colors)
+    catch
+        @warn "Could not build pie palette from FUEL_COLORS; using default colours."
+        :auto
+    end
     p = pie(labels, values_,
-            seriescolor=colors_for(labels),
+            palette=pie_palette,
+            size=(900, 600),
             title="Installed Capacity by Fuel Type — $SCENARIO_LABEL", titlefontsize=10,
             legend=:outertopright)
 
@@ -242,7 +260,10 @@ function plot_daily_stacked(data, rep_index, output_path)
     # renewables on top.
     # Explicit stack order (per meeting notes 8/12): baseload at the bottom,
     # then dispatchable thermal, then variable renewables (solar before wind).
-    STACK_ORDER = ["nuclear", "coal", "ng", "hydro", "solar", "wind", "wind_offshore"]
+    # areaplot stacks the FIRST series at the bottom, so this list runs
+    # bottom -> top: static baseload first, then dispatchable thermal, then
+    # variable renewables with wind below and solar on top.
+    STACK_ORDER = ["nuclear", "coal", "ng", "hydro", "wind", "wind_offshore", "solar"]
     order_rank(t) = something(findfirst(==(string(t)), STACK_ORDER), length(STACK_ORDER) + 1)
     active_nonrenewables = sort(active_nonrenewables, by = order_rank)
     active_renewables    = sort(active_renewables,    by = order_rank)
@@ -275,6 +296,7 @@ function plot_daily_stacked(data, rep_index, output_path)
                  seriescolor=colors_for(gen_labels),
                  title="Available Capacity vs. Load — $SCENARIO_LABEL, Day $rep_index", titlefontsize=10,
                  xlabel="Hour of representative day", ylabel="Power (MW)",
+                 size=(1000, 600), left_margin=6Plots.mm, bottom_margin=5Plots.mm,
                  legend=:outertopright)
 
     plot!(p, hours, total_load,
@@ -334,7 +356,10 @@ function plot_actual_dispatch(simdir, data, rep_index, output_path)
     # Explicit stack order (per meeting notes 8/12): baseload at the bottom,
     # then dispatchable thermal, then variable renewables with solar before
     # wind. Alphabetical sorting previously put wind before solar.
-    STACK_ORDER = ["nuclear", "coal", "ng", "hydro", "solar", "wind", "wind_offshore"]
+    # areaplot stacks the FIRST series at the bottom, so this list runs
+    # bottom -> top: static baseload first, then dispatchable thermal, then
+    # variable renewables with wind below and solar on top.
+    STACK_ORDER = ["nuclear", "coal", "ng", "hydro", "wind", "wind_offshore", "solar"]
     order_rank(t) = something(findfirst(==(string(t)), STACK_ORDER), length(STACK_ORDER) + 1)
     active_types = sort(active_types, by = order_rank)
 
@@ -410,6 +435,7 @@ function plot_actual_dispatch(simdir, data, rep_index, output_path)
                  seriescolor=colors_for(stack_labels),
                  title="Actual Dispatch — $SCENARIO_LABEL, Day $rep_index", titlefontsize=10,
                  xlabel="Hour of representative day", ylabel="Power (MW)",
+                 size=(1000, 600), left_margin=6Plots.mm, bottom_margin=5Plots.mm,
                  legend=:outertopright)
 
     plot!(p, hours, total_load,

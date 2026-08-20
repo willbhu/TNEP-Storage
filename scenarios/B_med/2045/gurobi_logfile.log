@@ -1,11 +1,11 @@
 
-Gurobi 11.0.3 (win64) logging started Tue Aug 18 21:35:44 2026
+Gurobi 11.0.3 (win64) logging started Wed Aug 19 20:37:11 2026
 
 Set parameter LogFile to value "scenarios/B_med/2045\gurobi_logfile.log"
 Set parameter MIPGap to value 0.01
 Set parameter TimeLimit to value 84600
 
-Gurobi 11.0.3 (win64) logging started Tue Aug 18 21:35:44 2026
+Gurobi 11.0.3 (win64) logging started Wed Aug 19 20:37:11 2026
 
 Set parameter LogFile to value "scenarios/B_med/2045\gurobi_logfile.log"
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
@@ -24,7 +24,7 @@ Warning: Model contains large objective coefficients
          Consider reformulating model or setting NumericFocus parameter
          to avoid numerical issues.
 Presolve removed 153206 rows and 65166 columns
-Presolve time: 0.15s
+Presolve time: 0.23s
 Presolved: 48024 rows, 146392 columns, 288392 nonzeros
 
 Concurrent LP optimizer: primal simplex, dual simplex, and barrier
@@ -38,11 +38,7 @@ Barrier statistics:
  Factor Ops : 1.252e+04 (less than 1 second per iteration)
  Threads    : 1
 
-                  Objective                Residual
-Iter       Primal          Dual         Primal    Dual     Compl     Time
-   0   4.68766611e+13 -6.88697371e+13  5.40e+03 4.84e+10  9.79e+10     0s
-
-Barrier performed 0 iterations in 0.19 seconds (0.29 work units)
+Barrier performed 0 iterations in 0.29 seconds (0.29 work units)
 Barrier solve interrupted - model solved by another algorithm
 
 
@@ -64,10 +60,10 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
    50065    5.9772772e+11   0.000000e+00   0.000000e+00      1s
    50065    5.9772772e+11   0.000000e+00   0.000000e+00      1s
 
-Solved in 50065 iterations and 1.09 seconds (1.52 work units)
+Solved in 50065 iterations and 1.48 seconds (1.52 work units)
 Optimal objective  5.977277245e+11
 
-User-callback calls 50622, time in user-callback 0.01 sec
+User-callback calls 50618, time in user-callback 0.01 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -88,10 +84,10 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9772772e+11   2.331567e+02   0.000000e+00      0s
     3354    5.9886017e+11   0.000000e+00   0.000000e+00      2s
 
-Solved in 3354 iterations and 1.62 seconds (2.82 work units)
+Solved in 3354 iterations and 1.93 seconds (2.82 work units)
 Optimal objective  5.988601675e+11
 
-User-callback calls 3379, time in user-callback 0.01 sec
+User-callback calls 3379, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -110,12 +106,12 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9886017e+11   4.563889e+02   0.000000e+00      0s
-    3174    5.9891845e+11   0.000000e+00   0.000000e+00      2s
+    3174    5.9891845e+11   0.000000e+00   0.000000e+00      3s
 
-Solved in 3174 iterations and 2.09 seconds (4.77 work units)
+Solved in 3174 iterations and 2.54 seconds (4.77 work units)
 Optimal objective  5.989184451e+11
 
-User-callback calls 3199, time in user-callback 0.01 sec
+User-callback calls 3199, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -136,7 +132,7 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9891845e+11   2.826475e+02   0.000000e+00      0s
     3316    5.9916845e+11   0.000000e+00   0.000000e+00      2s
 
-Solved in 3316 iterations and 2.01 seconds (3.88 work units)
+Solved in 3316 iterations and 2.26 seconds (3.88 work units)
 Optimal objective  5.991684547e+11
 
 User-callback calls 3341, time in user-callback 0.00 sec
@@ -160,7 +156,7 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9916845e+11   1.605459e+02   0.000000e+00      0s
     1951    5.9948961e+11   0.000000e+00   0.000000e+00      1s
 
-Solved in 1951 iterations and 1.18 seconds (2.14 work units)
+Solved in 1951 iterations and 1.38 seconds (2.14 work units)
 Optimal objective  5.994896097e+11
 
 User-callback calls 1976, time in user-callback 0.00 sec
@@ -182,10 +178,10 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9948961e+11   1.619340e+02   0.000000e+00      0s
-    6610    5.9966017e+11   3.038406e+03   0.000000e+00      5s
-    8461    5.9966141e+11   0.000000e+00   0.000000e+00      8s
+    6190    5.9966012e+11   2.283998e+03   0.000000e+00      5s
+    8461    5.9966141e+11   0.000000e+00   0.000000e+00      9s
 
-Solved in 8461 iterations and 7.84 seconds (14.30 work units)
+Solved in 8461 iterations and 9.35 seconds (14.30 work units)
 Optimal objective  5.996614141e+11
 
 User-callback calls 8487, time in user-callback 0.03 sec
@@ -207,12 +203,12 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9966141e+11   1.338590e+02   0.000000e+00      0s
-    4645    5.9976017e+11   0.000000e+00   0.000000e+00      4s
+    4645    5.9976017e+11   0.000000e+00   0.000000e+00      5s
 
-Solved in 4645 iterations and 3.96 seconds (8.48 work units)
+Solved in 4645 iterations and 4.59 seconds (8.48 work units)
 Optimal objective  5.997601700e+11
 
-User-callback calls 4670, time in user-callback 0.01 sec
+User-callback calls 4670, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -233,10 +229,10 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9976017e+11   9.425690e+01   0.000000e+00      0s
     1485    5.9979957e+11   0.000000e+00   0.000000e+00      2s
 
-Solved in 1485 iterations and 2.19 seconds (4.17 work units)
+Solved in 1485 iterations and 2.47 seconds (4.17 work units)
 Optimal objective  5.997995726e+11
 
-User-callback calls 1510, time in user-callback 0.01 sec
+User-callback calls 1510, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -255,12 +251,13 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9979957e+11   1.455349e+02   0.000000e+00      0s
-    3603    5.9980853e+11   0.000000e+00   0.000000e+00      5s
+    3460    5.9980853e+11   4.348103e+01   0.000000e+00      5s
+    3603    5.9980853e+11   0.000000e+00   0.000000e+00      6s
 
-Solved in 3603 iterations and 4.96 seconds (9.73 work units)
+Solved in 3603 iterations and 5.72 seconds (9.73 work units)
 Optimal objective  5.998085264e+11
 
-User-callback calls 3628, time in user-callback 0.01 sec
+User-callback calls 3629, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -279,23 +276,25 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9980853e+11   8.240339e+01   0.000000e+00      0s
-    3450    5.9982542e+11   1.977723e+04   0.000000e+00      5s
-    5720    5.9982578e+11   1.227003e+06   0.000000e+00     10s
+    3120    5.9982537e+11   6.906742e+04   0.000000e+00      5s
+    5180    5.9982543e+11   8.847814e+04   0.000000e+00     10s
 Warning: Markowitz tolerance tightened to 0.0625
 Warning: Markowitz tolerance tightened to 0.25
-    8410    5.9982680e+11   5.424026e+06   0.000000e+00     15s
-   10620    5.9982681e+11   3.145241e+05   0.000000e+00     20s
-   13370    5.9982681e+11   3.107199e+04   0.000000e+00     25s
-   14870    5.9982683e+11   6.789456e+03   0.000000e+00     30s
-   16470    5.9982684e+11   1.129210e+03   0.000000e+00     35s
-   17830    5.9982684e+11   1.737318e+02   0.000000e+00     40s
-   19090    5.9982684e+11   4.287159e+02   0.000000e+00     45s
-   19833    5.9982684e+11   0.000000e+00   0.000000e+00     49s
+    7260    5.9982675e+11   3.288317e+05   0.000000e+00     15s
+    9330    5.9982680e+11   9.714459e+05   0.000000e+00     20s
+   11730    5.9982681e+11   1.460936e+05   0.000000e+00     25s
+   13510    5.9982681e+11   2.977005e+04   0.000000e+00     30s
+   14710    5.9982683e+11   1.844724e+04   0.000000e+00     35s
+   16370    5.9982684e+11   6.841224e+02   0.000000e+00     41s
+   17410    5.9982684e+11   8.588065e+02   0.000000e+00     45s
+   18590    5.9982684e+11   9.288866e+01   0.000000e+00     50s
+   19590    5.9982684e+11   4.493186e+01   0.000000e+00     55s
+   19833    5.9982684e+11   0.000000e+00   0.000000e+00     56s
 
-Solved in 19833 iterations and 48.76 seconds (86.44 work units)
+Solved in 19833 iterations and 56.43 seconds (86.44 work units)
 Optimal objective  5.998268400e+11
 
-User-callback calls 19869, time in user-callback 0.09 sec
+User-callback calls 19871, time in user-callback 0.10 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -314,17 +313,18 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9982684e+11   1.067122e+02   0.000000e+00      0s
-    2370    5.9986096e+11   1.737893e+05   0.000000e+00      5s
-    3730    5.9986185e+11   7.213956e+05   0.000000e+00     10s
-    5390    5.9986528e+11   3.600382e+04   0.000000e+00     15s
-    7560    5.9986594e+11   9.308011e+04   0.000000e+00     20s
-    9380    5.9986802e+11   7.483969e+05   0.000000e+00     25s
-   10023    5.9986985e+11   0.000000e+00   0.000000e+00     28s
+    2200    5.9986096e+11   9.551440e+04   0.000000e+00      5s
+    3250    5.9986106e+11   4.814994e+04   0.000000e+00     11s
+    4530    5.9986420e+11   3.761602e+04   0.000000e+00     15s
+    6150    5.9986554e+11   7.518571e+03   0.000000e+00     20s
+    8020    5.9986692e+11   6.040772e+03   0.000000e+00     25s
+    9380    5.9986802e+11   7.483969e+05   0.000000e+00     30s
+   10023    5.9986985e+11   0.000000e+00   0.000000e+00     33s
 
-Solved in 10023 iterations and 27.83 seconds (49.40 work units)
+Solved in 10023 iterations and 33.24 seconds (49.40 work units)
 Optimal objective  5.998698492e+11
 
-User-callback calls 10053, time in user-callback 0.05 sec
+User-callback calls 10054, time in user-callback 0.07 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -343,12 +343,12 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9986985e+11   1.473615e+02   0.000000e+00      0s
-    1560    5.9989059e+11   2.098892e+04   0.000000e+00      5s
-    2890    5.9989118e+11   8.359824e+02   0.000000e+00     10s
-    4070    5.9989119e+11   3.478207e+03   0.000000e+00     15s
+    1560    5.9989059e+11   2.098892e+04   0.000000e+00      6s
+    2890    5.9989118e+11   8.359824e+02   0.000000e+00     11s
+    3930    5.9989119e+11   4.358398e+04   0.000000e+00     15s
     4139    5.9989119e+11   0.000000e+00   0.000000e+00     16s
 
-Solved in 4139 iterations and 15.63 seconds (26.89 work units)
+Solved in 4139 iterations and 16.04 seconds (26.89 work units)
 Optimal objective  5.998911922e+11
 
 User-callback calls 4167, time in user-callback 0.03 sec
@@ -372,25 +372,27 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9989119e+11   1.581491e+02   0.000000e+00      0s
     1390    5.9989268e+11   3.560592e+05   0.000000e+00      5s
     3040    5.9989524e+11   2.087646e+05   0.000000e+00     10s
-    4380    5.9989764e+11   2.126360e+05   0.000000e+00     15s
-    5780    5.9989764e+11   4.056920e+05   0.000000e+00     20s
-    6960    5.9989765e+11   2.065647e+05   0.000000e+00     25s
-    8170    5.9989765e+11   1.057358e+08   0.000000e+00     30s
-    9500    5.9989788e+11   6.018383e+05   0.000000e+00     35s
-   10650    5.9989789e+11   3.995792e+06   0.000000e+00     40s
-   11790    5.9989789e+11   3.400937e+04   0.000000e+00     46s
-   12850    5.9989853e+11   9.907878e+03   0.000000e+00     50s
-   13990    5.9989855e+11   7.844064e+04   0.000000e+00     55s
-   15000    5.9989858e+11   1.695321e+04   0.000000e+00     60s
-   16240    5.9989894e+11   1.497072e+04   0.000000e+00     66s
-   17280    5.9989920e+11   4.377644e+04   0.000000e+00     71s
-   18480    5.9989951e+11   1.514242e+03   0.000000e+00     75s
-   19562    5.9989960e+11   0.000000e+00   0.000000e+00     80s
+    4230    5.9989764e+11   2.283298e+05   0.000000e+00     15s
+    5650    5.9989764e+11   4.612805e+05   0.000000e+00     20s
+    6690    5.9989765e+11   2.407346e+05   0.000000e+00     26s
+    7770    5.9989765e+11   4.601555e+05   0.000000e+00     30s
+    8990    5.9989788e+11   2.246767e+04   0.000000e+00     35s
+   10020    5.9989788e+11   1.862926e+06   0.000000e+00     40s
+   11020    5.9989789e+11   4.299044e+06   0.000000e+00     45s
+   12030    5.9989789e+11   5.518578e+04   0.000000e+00     50s
+   12980    5.9989855e+11   1.245384e+05   0.000000e+00     55s
+   13990    5.9989855e+11   7.844064e+04   0.000000e+00     60s
+   15000    5.9989858e+11   1.695321e+04   0.000000e+00     66s
+   15960    5.9989894e+11   2.321648e+03   0.000000e+00     70s
+   17000    5.9989894e+11   1.258787e+03   0.000000e+00     76s
+   18090    5.9989949e+11   3.456444e+04   0.000000e+00     80s
+   19160    5.9989954e+11   1.483703e+03   0.000000e+00     85s
+   19562    5.9989960e+11   0.000000e+00   0.000000e+00     87s
 
-Solved in 19562 iterations and 79.86 seconds (138.38 work units)
+Solved in 19562 iterations and 86.88 seconds (138.38 work units)
 Optimal objective  5.998995997e+11
 
-User-callback calls 19603, time in user-callback 0.13 sec
+User-callback calls 19605, time in user-callback 0.14 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -409,14 +411,14 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -5.7144419e+24   5.412137e+31   4.729256e-06      0s
-    2175    5.9991018e+11   3.556947e+04   0.000000e+00      5s
-    3445    5.9991033e+11   1.090912e+02   0.000000e+00     10s
-    4123    5.9991033e+11   0.000000e+00   0.000000e+00     13s
+    2075    5.9991008e+11   1.616047e+04   0.000000e+00      5s
+    3305    5.9991033e+11   1.632385e+02   0.000000e+00     10s
+    4123    5.9991033e+11   0.000000e+00   0.000000e+00     14s
 
-Solved in 4123 iterations and 12.81 seconds (23.59 work units)
+Solved in 4123 iterations and 13.66 seconds (23.59 work units)
 Optimal objective  5.999103304e+11
 
-User-callback calls 4154, time in user-callback 0.02 sec
+User-callback calls 4154, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -435,13 +437,13 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9991033e+11   1.157101e+02   0.000000e+00      0s
-    2033    5.9991523e+11   6.930249e+02   0.000000e+00      6s
+    1883    5.9991522e+11   5.294214e+02   0.000000e+00      5s
     2405    5.9991524e+11   0.000000e+00   0.000000e+00      7s
 
-Solved in 2405 iterations and 7.15 seconds (13.05 work units)
+Solved in 2405 iterations and 7.25 seconds (13.05 work units)
 Optimal objective  5.999152380e+11
 
-User-callback calls 2431, time in user-callback 0.02 sec
+User-callback calls 2431, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -460,17 +462,17 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9991524e+11   5.971800e+01   0.000000e+00      0s
-    1730    5.9991863e+11   2.111012e+05   0.000000e+00      5s
-    3170    5.9991864e+11   8.988872e+04   0.000000e+00     10s
-    4320    5.9991866e+11   7.816643e+04   0.000000e+00     15s
-    5580    5.9991867e+11   1.432612e+04   0.000000e+00     21s
-    6730    5.9991878e+11   3.049809e+01   0.000000e+00     25s
-    6797    5.9991878e+11   0.000000e+00   0.000000e+00     26s
+    1590    5.9991863e+11   1.468678e+05   0.000000e+00      5s
+    3070    5.9991864e+11   8.211024e+04   0.000000e+00     10s
+    4180    5.9991865e+11   1.167022e+05   0.000000e+00     15s
+    5300    5.9991866e+11   2.680150e+04   0.000000e+00     20s
+    6280    5.9991868e+11   7.047584e+02   0.000000e+00     25s
+    6797    5.9991878e+11   0.000000e+00   0.000000e+00     28s
 
-Solved in 6797 iterations and 25.74 seconds (45.89 work units)
+Solved in 6797 iterations and 27.52 seconds (45.89 work units)
 Optimal objective  5.999187802e+11
 
-User-callback calls 6827, time in user-callback 0.03 sec
+User-callback calls 6827, time in user-callback 0.06 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -489,13 +491,14 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9991878e+11   6.907783e+01   0.000000e+00      0s
-    2020    5.9993059e+11   4.855987e+04   0.000000e+00      5s
+    1850    5.9993057e+11   6.089699e+04   0.000000e+00      5s
+    3100    5.9993124e+11   2.634962e+02   0.000000e+00     10s
     3375    5.9993126e+11   0.000000e+00   0.000000e+00     11s
 
-Solved in 3375 iterations and 10.67 seconds (18.99 work units)
+Solved in 3375 iterations and 11.36 seconds (18.99 work units)
 Optimal objective  5.999312554e+11
 
-User-callback calls 3401, time in user-callback 0.02 sec
+User-callback calls 3402, time in user-callback 0.03 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -514,15 +517,16 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.9993126e+11   7.590649e+01   0.000000e+00      0s
-    1580    6.0002941e+11   1.886854e+04   0.000000e+00      5s
-    3030    6.0003135e+11   4.133465e+05   0.000000e+00     11s
-    4200    6.0003193e+11   3.611616e+04   0.000000e+00     15s
-    4894    6.0003224e+11   0.000000e+00   0.000000e+00     18s
+    1580    6.0002941e+11   1.886854e+04   0.000000e+00      6s
+    2730    6.0003115e+11   1.096629e+05   0.000000e+00     10s
+    3910    6.0003189e+11   2.094248e+03   0.000000e+00     16s
+    4800    6.0003223e+11   7.608507e+00   0.000000e+00     20s
+    4894    6.0003224e+11   0.000000e+00   0.000000e+00     21s
 
-Solved in 4894 iterations and 18.07 seconds (32.86 work units)
+Solved in 4894 iterations and 20.91 seconds (32.86 work units)
 Optimal objective  6.000322412e+11
 
-User-callback calls 4923, time in user-callback 0.02 sec
+User-callback calls 4924, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -541,17 +545,19 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    8.6385647e+23   2.362378e+31   1.748558e-06      0s
-    1885    5.9990752e+11   4.594356e+01   2.770810e+09      5s
-    5729    7.1516897e+11   0.000000e+00   5.840661e+14     10s
-   12255    6.0036095e+11   0.000000e+00   2.515702e+10     15s
-   17367    6.0009707e+11   0.000000e+00   2.979191e+11     20s
-   21288    6.0007588e+11   0.000000e+00   9.105407e+07     25s
-   25201    6.0007464e+11   0.000000e+00   0.000000e+00     29s
+    1482    5.9991325e+11   4.611805e+01   3.255163e+10      5s
+    4777    8.6850637e+11   7.755897e+00   5.723320e+10     10s
+    8295    6.0147394e+11   0.000000e+00   1.024226e+12     15s
+   13941    6.0026345e+11   0.000000e+00   7.681412e+10     20s
+   17367    6.0009707e+11   0.000000e+00   2.979191e+11     25s
+   20338    6.0007724e+11   0.000000e+00   2.166889e+09     30s
+   24955    6.0007460e+11   0.000000e+00   5.836340e+06     35s
+   25201    6.0007464e+11   0.000000e+00   0.000000e+00     35s
 
-Solved in 25201 iterations and 29.01 seconds (83.49 work units)
+Solved in 25201 iterations and 35.47 seconds (83.49 work units)
 Optimal objective  6.000746354e+11
 
-User-callback calls 25305, time in user-callback 0.06 sec
+User-callback calls 25307, time in user-callback 0.08 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -571,15 +577,15 @@ LP warm-start: use basis
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -4.7934985e+25   1.032047e+32   2.060952e-05      0s
     1330    6.0011147e+11   9.967942e+02   0.000000e+00      5s
-    2450    6.0012091e+11   9.253933e+04   0.000000e+00     10s
+    2620    6.0012106e+11   4.510466e+04   0.000000e+00     10s
     3930    6.0012410e+11   6.574013e+02   0.000000e+00     15s
-    5130    6.0012582e+11   2.883213e+02   0.000000e+00     21s
+    5130    6.0012582e+11   2.883213e+02   0.000000e+00     20s
     5784    6.0012584e+11   0.000000e+00   0.000000e+00     24s
 
-Solved in 5784 iterations and 23.54 seconds (40.57 work units)
+Solved in 5784 iterations and 23.78 seconds (40.57 work units)
 Optimal objective  6.001258403e+11
 
-User-callback calls 5813, time in user-callback 0.04 sec
+User-callback calls 5813, time in user-callback 0.07 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -598,27 +604,27 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    6.0012584e+11   5.556356e+01   0.000000e+00      0s
-    1480    6.0014143e+11   3.030370e+04   0.000000e+00      5s
-    2620    6.0014276e+11   2.947433e+05   0.000000e+00     10s
-    3630    6.0014585e+11   1.325052e+05   0.000000e+00     15s
-    4610    6.0014617e+11   9.401837e+06   0.000000e+00     20s
-    5780    6.0014718e+11   6.747319e+04   0.000000e+00     26s
-    6870    6.0014850e+11   3.452669e+04   0.000000e+00     30s
-    8020    6.0014909e+11   2.511442e+05   0.000000e+00     35s
-    9250    6.0014972e+11   1.969458e+06   0.000000e+00     41s
-   10190    6.0015019e+11   7.689616e+03   0.000000e+00     45s
-   11030    6.0015025e+11   1.500786e+04   0.000000e+00     50s
-   11810    6.0015025e+11   4.746170e+04   0.000000e+00     56s
-   12520    6.0015040e+11   2.189560e+03   0.000000e+00     60s
-   13370    6.0015066e+11   1.071877e+03   0.000000e+00     65s
-   14400    6.0015101e+11   6.355356e+03   0.000000e+00     71s
-   15159    6.0015105e+11   0.000000e+00   0.000000e+00     75s
+    1330    6.0014122e+11   3.023877e+04   0.000000e+00      5s
+    2480    6.0014249e+11   9.400537e+04   0.000000e+00     10s
+    3630    6.0014585e+11   1.325052e+05   0.000000e+00     16s
+    4470    6.0014612e+11   1.075187e+06   0.000000e+00     20s
+    5500    6.0014711e+11   5.262808e+05   0.000000e+00     25s
+    6590    6.0014814e+11   6.124775e+04   0.000000e+00     31s
+    7600    6.0014883e+11   3.693487e+04   0.000000e+00     35s
+    8740    6.0014909e+11   1.661540e+05   0.000000e+00     41s
+    9790    6.0015004e+11   2.052476e+04   0.000000e+00     46s
+   10750    6.0015025e+11   1.456806e+04   0.000000e+00     51s
+   11670    6.0015025e+11   1.354475e+04   0.000000e+00     56s
+   12660    6.0015044e+11   1.683197e+04   0.000000e+00     60s
+   13680    6.0015076e+11   2.924736e+04   0.000000e+00     66s
+   14680    6.0015103e+11   1.043672e+03   0.000000e+00     71s
+   15159    6.0015105e+11   0.000000e+00   0.000000e+00     73s
 
-Solved in 15159 iterations and 75.33 seconds (116.40 work units)
+Solved in 15159 iterations and 73.24 seconds (116.40 work units)
 Optimal objective  6.001510459e+11
 Warning: unscaled dual violation = 0.000163948 and residual = 0.00815015
 
-User-callback calls 15201, time in user-callback 0.09 sec
+User-callback calls 15201, time in user-callback 0.13 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -637,22 +643,23 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -2.3752199e+24   1.789474e+31   3.286557e-06      0s
-    1302    6.0015330e+11   1.932694e+06   0.000000e+00      5s
-    2382    6.0015409e+11   2.502888e+05   0.000000e+00     10s
-    3452    6.0015425e+11   9.749753e+04   0.000000e+00     15s
-    4442    6.0015522e+11   8.807650e+04   0.000000e+00     20s
-    5912    6.0016168e+11   5.873572e+04   0.000000e+00     26s
-    6902    6.0016192e+11   2.662378e+04   0.000000e+00     30s
-    7892    6.0016227e+11   4.835099e+02   0.000000e+00     35s
-    8872    6.0016257e+11   4.680208e+03   0.000000e+00     40s
-    9852    6.0016273e+11   1.048157e+03   0.000000e+00     45s
-   10832    6.0016291e+11   2.358121e+03   0.000000e+00     50s
-   11685    6.0016295e+11   0.000000e+00   0.000000e+00     55s
+    1132    6.0015318e+11   1.250019e+04   0.000000e+00      6s
+    2102    6.0015405e+11   2.193500e+05   0.000000e+00     11s
+    3102    6.0015425e+11   9.490498e+04   0.000000e+00     16s
+    4022    6.0015430e+11   6.971139e+04   0.000000e+00     20s
+    5192    6.0015808e+11   3.926095e+04   0.000000e+00     25s
+    6332    6.0016173e+11   5.274810e+06   0.000000e+00     30s
+    7462    6.0016201e+11   6.966807e+02   0.000000e+00     36s
+    8452    6.0016256e+11   3.859950e+03   0.000000e+00     40s
+    9432    6.0016265e+11   1.484019e+03   0.000000e+00     45s
+   10412    6.0016283e+11   3.194127e+04   0.000000e+00     50s
+   11532    6.0016295e+11   4.587620e+01   0.000000e+00     56s
+   11685    6.0016295e+11   0.000000e+00   0.000000e+00     57s
 
-Solved in 11685 iterations and 54.62 seconds (91.80 work units)
+Solved in 11685 iterations and 56.67 seconds (91.80 work units)
 Optimal objective  6.001629482e+11
 
-User-callback calls 11724, time in user-callback 0.09 sec
+User-callback calls 11725, time in user-callback 0.03 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -671,21 +678,21 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    1.5126460e+24   1.600287e+32   8.402498e-06      0s
-    1390    6.0018936e+11   1.043311e+03   0.000000e+00      5s
+    1530    6.0018936e+11   1.705821e+03   0.000000e+00      6s
     2770    6.0019141e+11   1.155443e+04   0.000000e+00     10s
-    3760    6.0019146e+11   6.710141e+05   0.000000e+00     15s
-    4900    6.0019152e+11   3.597807e+04   0.000000e+00     21s
+    3910    6.0019147e+11   1.597939e+05   0.000000e+00     16s
+    4900    6.0019152e+11   3.597807e+04   0.000000e+00     20s
     5890    6.0019158e+11   2.260759e+04   0.000000e+00     25s
-    6890    6.0019172e+11   5.838840e+03   0.000000e+00     30s
-    8040    6.0019183e+11   8.142348e+02   0.000000e+00     36s
-    9040    6.0019190e+11   5.932446e+03   0.000000e+00     40s
-   10060    6.0019193e+11   1.686223e+03   0.000000e+00     45s
-   10391    6.0019193e+11   0.000000e+00   0.000000e+00     47s
+    7040    6.0019176e+11   2.120528e+05   0.000000e+00     31s
+    7760    6.0019183e+11   3.878462e+03   0.000000e+00     35s
+    8740    6.0019188e+11   1.617607e+03   0.000000e+00     40s
+    9770    6.0019192e+11   1.083977e+04   0.000000e+00     45s
+   10391    6.0019193e+11   0.000000e+00   0.000000e+00     48s
 
-Solved in 10391 iterations and 46.82 seconds (83.04 work units)
+Solved in 10391 iterations and 48.33 seconds (83.04 work units)
 Optimal objective  6.001919297e+11
 
-User-callback calls 10426, time in user-callback 0.07 sec
+User-callback calls 10426, time in user-callback 0.05 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -705,24 +712,25 @@ LP warm-start: use basis
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    6.0019193e+11   6.576489e+01   0.000000e+00      0s
     1300    6.0019599e+11   1.584998e+05   0.000000e+00      5s
-    2490    6.0019728e+11   1.137664e+05   0.000000e+00     10s
-    3650    6.0019740e+11   4.091044e+05   0.000000e+00     15s
-    4830    6.0019755e+11   7.229968e+05   0.000000e+00     20s
-    5960    6.0019763e+11   2.832385e+04   0.000000e+00     26s
-    6960    6.0019788e+11   2.192307e+06   0.000000e+00     30s
-    8000    6.0019816e+11   8.063007e+03   0.000000e+00     35s
-    9120    6.0019823e+11   7.583392e+03   0.000000e+00     40s
-   10100    6.0019832e+11   7.157710e+04   0.000000e+00     45s
-   11220    6.0019834e+11   4.230459e+04   0.000000e+00     51s
-   12200    6.0019836e+11   2.148816e+04   0.000000e+00     55s
-   13210    6.0019840e+11   2.357837e+02   0.000000e+00     60s
-   14046    6.0019840e+11   0.000000e+00   0.000000e+00     65s
+    2330    6.0019722e+11   1.521013e+05   0.000000e+00     10s
+    3500    6.0019738e+11   5.412944e+05   0.000000e+00     15s
+    4690    6.0019750e+11   7.993025e+06   0.000000e+00     21s
+    5680    6.0019761e+11   3.292358e+05   0.000000e+00     25s
+    6660    6.0019771e+11   3.029042e+06   0.000000e+00     30s
+    7700    6.0019809e+11   7.796960e+03   0.000000e+00     35s
+    8700    6.0019818e+11   3.340578e+04   0.000000e+00     40s
+    9680    6.0019826e+11   3.150639e+04   0.000000e+00     46s
+   10520    6.0019833e+11   7.323628e+04   0.000000e+00     50s
+   11500    6.0019834e+11   1.045913e+05   0.000000e+00     55s
+   12480    6.0019836e+11   2.515441e+02   0.000000e+00     61s
+   13490    6.0019840e+11   1.367512e+02   0.000000e+00     66s
+   14046    6.0019840e+11   0.000000e+00   0.000000e+00     69s
 
-Solved in 14046 iterations and 64.57 seconds (119.43 work units)
+Solved in 14046 iterations and 69.12 seconds (119.43 work units)
 Optimal objective  6.001983980e+11
 Warning: unscaled dual violation = 3.3416e-06 and residual = 1.2325e-05
 
-User-callback calls 14085, time in user-callback 0.10 sec
+User-callback calls 14086, time in user-callback 0.09 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -741,19 +749,20 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -6.7784468e+24   7.740634e+31   8.691342e-06      0s
-    2306    6.0016257e+11   1.450832e+01   1.489344e+09      5s
-    6786    7.6398589e+11   0.000000e+00   3.019357e+14     10s
-   10025    6.0126505e+11   0.000000e+00   2.915883e+11     15s
-   14202    6.0028904e+11   0.000000e+00   3.894363e+11     20s
-   17900    6.0022548e+11   0.000000e+00   7.864068e+10     25s
-   22539    6.0021593e+11   0.000000e+00   1.392329e+08     30s
-   28118    6.0021508e+11   0.000000e+00   9.689502e+06     35s
-   31239    6.0021508e+11   0.000000e+00   0.000000e+00     36s
+    1489    6.0016768e+11   1.401286e+01   1.454051e+09      5s
+    5812    6.3189738e+11   8.199782e+00   2.107841e+10     10s
+    8280    6.1083302e+11   0.000000e+00   3.365443e+12     15s
+   11048    6.0084284e+11   0.000000e+00   3.898641e+11     20s
+   14716    6.0026771e+11   0.000000e+00   6.415084e+10     25s
+   17900    6.0022548e+11   0.000000e+00   7.864068e+10     30s
+   22140    6.0021607e+11   0.000000e+00   1.710318e+08     35s
+   25891    6.0021515e+11   0.000000e+00   4.818775e+07     40s
+   31239    6.0021508e+11   0.000000e+00   0.000000e+00     44s
 
-Solved in 31239 iterations and 36.46 seconds (109.66 work units)
+Solved in 31239 iterations and 43.52 seconds (109.66 work units)
 Optimal objective  6.002150772e+11
 
-User-callback calls 31381, time in user-callback 0.05 sec
+User-callback calls 31382, time in user-callback 0.15 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -772,22 +781,23 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    2.1915912e+24   1.869285e+32   1.069980e-06      0s
-    1320    6.0023265e+11   3.818265e+04   0.000000e+00      5s
-    2550    6.0023328e+11   8.085078e+03   0.000000e+00     11s
-    3570    6.0023376e+11   2.547416e+04   0.000000e+00     15s
-    4840    6.0023736e+11   1.594690e+05   0.000000e+00     20s
-    5860    6.0023814e+11   1.087427e+04   0.000000e+00     25s
-    6900    6.0023857e+11   4.976516e+03   0.000000e+00     30s
-    7900    6.0023859e+11   6.206438e+03   0.000000e+00     35s
+    1180    6.0023265e+11   2.974422e+04   0.000000e+00      6s
+    2040    6.0023269e+11   6.937085e+04   0.000000e+00     10s
+    3130    6.0023368e+11   2.239107e+03   0.000000e+00     15s
+    4170    6.0023416e+11   2.273712e+06   0.000000e+00     20s
+    5280    6.0023796e+11   1.170499e+05   0.000000e+00     25s
+    6330    6.0023853e+11   2.929952e+03   0.000000e+00     30s
+    7190    6.0023858e+11   1.802900e+04   0.000000e+00     35s
+    8040    6.0023859e+11   6.233623e+03   0.000000e+00     40s
 Warning: Markowitz tolerance tightened to 0.0625
-    9020    6.0023861e+11   6.608693e+03   0.000000e+00     41s
-   10010    6.0023863e+11   2.475401e+03   0.000000e+00     45s
-   10400    6.0023864e+11   0.000000e+00   0.000000e+00     47s
+    9020    6.0023861e+11   6.608693e+03   0.000000e+00     46s
+    9870    6.0023863e+11   4.270314e+03   0.000000e+00     50s
+   10400    6.0023864e+11   0.000000e+00   0.000000e+00     53s
 
-Solved in 10400 iterations and 47.45 seconds (86.25 work units)
+Solved in 10400 iterations and 53.49 seconds (86.25 work units)
 Optimal objective  6.002386407e+11
 
-User-callback calls 10435, time in user-callback 0.07 sec
+User-callback calls 10436, time in user-callback 0.10 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -806,26 +816,27 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -3.2692635e+25   1.744622e+32   1.895223e-05      0s
-    1470    6.0025592e+11   1.934784e+04   0.000000e+00      5s
-    2560    6.0026069e+11   4.892094e+03   0.000000e+00     10s
-    3780    6.0026095e+11   1.088418e+05   0.000000e+00     16s
-    4840    6.0026174e+11   1.615022e+05   0.000000e+00     20s
-    6040    6.0026497e+11   2.545950e+04   0.000000e+00     25s
-    7360    6.0026524e+11   3.420819e+05   0.000000e+00     31s
-    8430    6.0026546e+11   2.572525e+05   0.000000e+00     35s
-    9540    6.0026559e+11   1.729766e+05   0.000000e+00     40s
-   10730    6.0026698e+11   9.276457e+03   0.000000e+00     46s
-   11750    6.0026701e+11   1.524828e+03   0.000000e+00     51s
-   12750    6.0026702e+11   1.115033e+04   0.000000e+00     56s
-   13751    6.0026703e+11   3.623458e+03   0.000000e+00     61s
-   14791    6.0026705e+11   2.537163e+03   0.000000e+00     65s
-   15971    6.0026706e+11   1.625346e+01   0.000000e+00     71s
-   16020    6.0026706e+11   0.000000e+00   0.000000e+00     71s
+    1330    6.0025589e+11   4.615634e+04   0.000000e+00      6s
+    2240    6.0025598e+11   1.475369e+05   0.000000e+00     10s
+    3180    6.0026073e+11   3.424109e+04   0.000000e+00     15s
+    4230    6.0026125e+11   2.866112e+04   0.000000e+00     21s
+    5140    6.0026440e+11   2.258511e+06   0.000000e+00     25s
+    6360    6.0026510e+11   6.817957e+04   0.000000e+00     31s
+    7360    6.0026524e+11   3.420819e+05   0.000000e+00     35s
+    8430    6.0026546e+11   2.572525e+05   0.000000e+00     40s
+    9540    6.0026559e+11   1.729766e+05   0.000000e+00     46s
+   10440    6.0026685e+11   1.645336e+04   0.000000e+00     50s
+   11450    6.0026700e+11   9.822603e+03   0.000000e+00     56s
+   12320    6.0026701e+11   2.527170e+05   0.000000e+00     60s
+   13321    6.0026702e+11   2.581102e+03   0.000000e+00     66s
+   14201    6.0026704e+11   6.856156e+04   0.000000e+00     70s
+   15261    6.0026705e+11   5.097676e+02   0.000000e+00     75s
+   16020    6.0026706e+11   0.000000e+00   0.000000e+00     80s
 
-Solved in 16020 iterations and 71.01 seconds (129.82 work units)
+Solved in 16020 iterations and 79.51 seconds (129.82 work units)
 Optimal objective  6.002670619e+11
 
-User-callback calls 16059, time in user-callback 0.13 sec
+User-callback calls 16060, time in user-callback 0.12 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -851,17 +862,18 @@ Warning: switch to quad precision
     2450    6.0032676e+11   1.136594e+04   0.000000e+00     15s
     3070    6.0032678e+11   3.677386e+03   0.000000e+00     21s
     3530    6.0032679e+11   1.100557e+03   0.000000e+00     25s
-    4160    6.0032686e+11   8.118511e+04   0.000000e+00     31s
-    4640    6.0032689e+11   7.823573e+03   0.000000e+00     35s
-    5250    6.0032691e+11   1.147005e+03   0.000000e+00     40s
-    5830    6.0032691e+11   7.590706e+02   0.000000e+00     46s
-    6300    6.0032691e+11   5.701431e+02   0.000000e+00     50s
-    6840    6.0032691e+11   0.000000e+00   0.000000e+00     55s
+    4030    6.0032684e+11   2.136575e+05   0.000000e+00     30s
+    4640    6.0032689e+11   7.823573e+03   0.000000e+00     36s
+    5130    6.0032690e+11   2.218386e+04   0.000000e+00     40s
+    5600    6.0032691e+11   6.268069e+03   0.000000e+00     45s
+    6180    6.0032691e+11   2.995345e+03   0.000000e+00     51s
+    6630    6.0032691e+11   1.245151e+02   0.000000e+00     55s
+    6840    6.0032691e+11   0.000000e+00   0.000000e+00     58s
 
-Solved in 6840 iterations and 55.42 seconds (108.03 work units)
+Solved in 6840 iterations and 57.63 seconds (108.03 work units)
 Optimal objective  6.003269111e+11
 
-User-callback calls 6877, time in user-callback 0.04 sec
+User-callback calls 6878, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -880,12 +892,13 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    7.2702365e+25   1.613152e+32   8.088845e-05      0s
-    1100    6.0034187e+11   0.000000e+00   0.000000e+00      5s
+    1050    6.0034187e+11   8.075477e+00   0.000000e+00      5s
+    1100    6.0034187e+11   0.000000e+00   0.000000e+00      6s
 
-Solved in 1100 iterations and 4.67 seconds (8.73 work units)
+Solved in 1100 iterations and 5.56 seconds (8.73 work units)
 Optimal objective  6.003418747e+11
 
-User-callback calls 1132, time in user-callback 0.00 sec
+User-callback calls 1133, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -904,19 +917,20 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -2.9181060e+26   2.281250e+34   1.216680e-04      0s
-    1360    6.0037074e+11   7.964351e+03   0.000000e+00      5s
-    2500    6.0037161e+11   1.861824e+03   0.000000e+00     10s
-    3480    6.0037161e+11   1.049521e+03   0.000000e+00     15s
-    4470    6.0037161e+11   4.189634e+03   0.000000e+00     21s
+    1200    6.0037070e+11   1.196451e+05   0.000000e+00      5s
+    2200    6.0037157e+11   8.378070e+02   0.000000e+00     11s
+    3060    6.0037161e+11   7.537996e+02   0.000000e+00     15s
+    3900    6.0037161e+11   1.806153e+03   0.000000e+00     20s
 Warning: Markowitz tolerance tightened to 0.03125
-    5470    6.0037163e+11   1.712213e+03   0.000000e+00     25s
-    6500    6.0037163e+11   1.316323e+04   0.000000e+00     30s
-    7332    6.0037163e+11   0.000000e+00   0.000000e+00     35s
+    4900    6.0037162e+11   8.620031e+02   0.000000e+00     26s
+    5760    6.0037163e+11   9.735857e+02   0.000000e+00     30s
+    6640    6.0037163e+11   6.136212e+03   0.000000e+00     36s
+    7332    6.0037163e+11   0.000000e+00   0.000000e+00     40s
 
-Solved in 7332 iterations and 34.69 seconds (63.32 work units)
+Solved in 7332 iterations and 39.90 seconds (63.32 work units)
 Optimal objective  6.003716308e+11
 
-User-callback calls 7365, time in user-callback 0.06 sec
+User-callback calls 7366, time in user-callback 0.07 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -935,17 +949,18 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    6.0037163e+11   4.705434e+01   0.000000e+00      0s
-    1150    6.0038551e+11   3.102377e+04   0.000000e+00      5s
-    2300    6.0038553e+11   1.366901e+03   0.000000e+00     11s
-    3300    6.0038560e+11   1.123257e+04   0.000000e+00     15s
-    4550    6.0038573e+11   3.070949e+04   0.000000e+00     21s
-    5600    6.0038577e+11   2.703808e+03   0.000000e+00     26s
-    6519    6.0038581e+11   0.000000e+00   0.000000e+00     30s
+    1150    6.0038551e+11   3.102377e+04   0.000000e+00      6s
+    2020    6.0038553e+11   3.178611e+03   0.000000e+00     10s
+    3000    6.0038554e+11   1.599009e+04   0.000000e+00     15s
+    4090    6.0038572e+11   2.353357e+04   0.000000e+00     20s
+    5140    6.0038576e+11   6.312414e+03   0.000000e+00     26s
+    6030    6.0038578e+11   7.754586e+03   0.000000e+00     30s
+    6519    6.0038581e+11   0.000000e+00   0.000000e+00     33s
 
-Solved in 6519 iterations and 30.06 seconds (56.09 work units)
+Solved in 6519 iterations and 32.87 seconds (56.09 work units)
 Optimal objective  6.003858054e+11
 
-User-callback calls 6549, time in user-callback 0.04 sec
+User-callback calls 6550, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -964,26 +979,28 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    6.0038581e+11   4.782268e+01   0.000000e+00      0s
-    1290    6.0042074e+11   1.537787e+05   0.000000e+00      6s
-    2380    6.0042097e+11   1.382178e+05   0.000000e+00     11s
-    3400    6.0042105e+11   2.473605e+04   0.000000e+00     16s
-    4460    6.0042116e+11   6.333841e+04   0.000000e+00     20s
-    5480    6.0042120e+11   1.086134e+04   0.000000e+00     25s
-    6550    6.0042126e+11   1.061587e+04   0.000000e+00     31s
-    7580    6.0042129e+11   1.313395e+04   0.000000e+00     36s
-    8660    6.0042139e+11   5.436962e+04   0.000000e+00     41s
-    9570    6.0042153e+11   3.179763e+05   0.000000e+00     45s
-   10560    6.0042167e+11   9.187518e+03   0.000000e+00     50s
-   11570    6.0042170e+11   1.830263e+04   0.000000e+00     55s
-   12600    6.0042172e+11   1.392953e+03   0.000000e+00     61s
-   13450    6.0042172e+11   1.544531e+04   0.000000e+00     65s
-   14430    6.0042173e+11   3.291901e+02   0.000000e+00     70s
-   14810    6.0042173e+11   0.000000e+00   0.000000e+00     73s
+    1150    6.0042074e+11   1.040063e+05   0.000000e+00      6s
+    2050    6.0042092e+11   1.503352e+05   0.000000e+00     10s
+    2950    6.0042102e+11   3.352663e+05   0.000000e+00     15s
+    3940    6.0042110e+11   1.837580e+05   0.000000e+00     20s
+    4890    6.0042118e+11   2.879386e+04   0.000000e+00     25s
+    5790    6.0042123e+11   6.957970e+04   0.000000e+00     30s
+    6710    6.0042127e+11   3.599100e+04   0.000000e+00     36s
+    7580    6.0042129e+11   1.313395e+04   0.000000e+00     40s
+    8510    6.0042138e+11   4.893153e+04   0.000000e+00     46s
+    9410    6.0042143e+11   2.647372e+04   0.000000e+00     51s
+   10280    6.0042167e+11   9.233427e+03   0.000000e+00     56s
+   11150    6.0042169e+11   1.183572e+03   0.000000e+00     61s
+   11880    6.0042171e+11   1.022260e+04   0.000000e+00     65s
+   12740    6.0042172e+11   1.392955e+03   0.000000e+00     70s
+   13590    6.0042172e+11   8.750298e+04   0.000000e+00     75s
+   14430    6.0042173e+11   3.291901e+02   0.000000e+00     80s
+   14810    6.0042173e+11   0.000000e+00   0.000000e+00     83s
 
-Solved in 14810 iterations and 72.52 seconds (131.97 work units)
+Solved in 14810 iterations and 82.74 seconds (131.97 work units)
 Optimal objective  6.004217265e+11
 
-User-callback calls 14850, time in user-callback 0.10 sec
+User-callback calls 14852, time in user-callback 0.10 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1002,21 +1019,23 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    2.8118966e+24   1.019737e+31   3.971583e-06      0s
-    1290    6.0044490e+11   6.589226e+04   0.000000e+00      5s
-    2370    6.0044579e+11   4.955449e+04   0.000000e+00     10s
-    3390    6.0044582e+11   6.888411e+03   0.000000e+00     15s
-    4510    6.0044585e+11   3.580250e+03   0.000000e+00     20s
-    5640    6.0044598e+11   2.544339e+04   0.000000e+00     25s
-    6700    6.0044611e+11   6.923324e+03   0.000000e+00     30s
-    7900    6.0044626e+11   3.293682e+03   0.000000e+00     35s
-    8960    6.0044632e+11   2.336997e+04   0.000000e+00     40s
-   10030    6.0044638e+11   3.889701e+02   0.000000e+00     45s
-   10506    6.0044639e+11   0.000000e+00   0.000000e+00     47s
+    1290    6.0044490e+11   6.589226e+04   0.000000e+00      6s
+    2220    6.0044578e+11   4.918547e+05   0.000000e+00     10s
+    3100    6.0044581e+11   5.545864e+04   0.000000e+00     15s
+    4100    6.0044584e+11   5.810458e+03   0.000000e+00     21s
+    5000    6.0044588e+11   7.015105e+04   0.000000e+00     25s
+    5970    6.0044610e+11   1.218064e+04   0.000000e+00     30s
+    6800    6.0044622e+11   1.690114e+04   0.000000e+00     35s
+    7740    6.0044625e+11   6.970344e+05   0.000000e+00     40s
+    8660    6.0044630e+11   1.019409e+03   0.000000e+00     45s
+    9560    6.0044637e+11   2.378955e+02   0.000000e+00     50s
+   10490    6.0044639e+11   6.909300e+00   0.000000e+00     55s
+   10506    6.0044639e+11   0.000000e+00   0.000000e+00     56s
 
-Solved in 10506 iterations and 47.47 seconds (90.18 work units)
+Solved in 10506 iterations and 55.73 seconds (90.18 work units)
 Optimal objective  6.004463868e+11
 
-User-callback calls 10541, time in user-callback 0.06 sec
+User-callback calls 10543, time in user-callback 0.09 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1035,16 +1054,17 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    5.7869797e+24   7.473738e+31   4.707708e-05      0s
-    1130    6.0045251e+11   7.262121e+03   0.000000e+00      5s
-    2120    6.0045252e+11   4.784599e+04   0.000000e+00     10s
-    3110    6.0045253e+11   1.053551e+03   0.000000e+00     15s
-    3825    6.0045254e+11   0.000000e+00   0.000000e+00     19s
+     980    6.0045251e+11   7.767055e+03   0.000000e+00      5s
+    1830    6.0045251e+11   1.176091e+03   0.000000e+00     10s
+    2690    6.0045253e+11   3.156342e+02   0.000000e+00     16s
+    3400    6.0045254e+11   5.224169e+01   0.000000e+00     20s
+    3825    6.0045254e+11   0.000000e+00   0.000000e+00     23s
 
-Solved in 3825 iterations and 18.91 seconds (35.11 work units)
+Solved in 3825 iterations and 22.95 seconds (35.11 work units)
 Optimal objective  6.004525395e+11
 Warning: unscaled dual violation = 8.34465e-06 and residual = 8.34605e-06
 
-User-callback calls 3855, time in user-callback 0.02 sec
+User-callback calls 3856, time in user-callback 0.05 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1063,20 +1083,22 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -9.5757428e+24   4.116138e+32   1.110748e-05      0s
-    1150    6.0046399e+11   6.504152e+03   0.000000e+00      5s
-    2340    6.0046428e+11   1.175378e+05   0.000000e+00     10s
-    3550    6.0046497e+11   1.939341e+04   0.000000e+00     16s
-    4690    6.0046532e+11   6.315321e+04   0.000000e+00     20s
-    5800    6.0046536e+11   7.622781e+04   0.000000e+00     26s
-    6960    6.0046551e+11   6.407034e+03   0.000000e+00     31s
-    7920    6.0046560e+11   3.357311e+06   0.000000e+00     35s
-    9000    6.0046563e+11   7.985777e+02   0.000000e+00     41s
-    9738    6.0046564e+11   0.000000e+00   0.000000e+00     44s
+     990    6.0046399e+11   1.672110e+05   0.000000e+00      6s
+    1800    6.0046420e+11   9.237337e+04   0.000000e+00     11s
+    2660    6.0046435e+11   2.182714e+04   0.000000e+00     15s
+    3550    6.0046497e+11   1.939341e+04   0.000000e+00     20s
+    4530    6.0046530e+11   5.015830e+03   0.000000e+00     26s
+    5460    6.0046534e+11   3.132791e+05   0.000000e+00     30s
+    6440    6.0046543e+11   1.686515e+05   0.000000e+00     35s
+    7600    6.0046557e+11   1.031334e+04   0.000000e+00     41s
+    8390    6.0046562e+11   1.100765e+03   0.000000e+00     45s
+    9460    6.0046564e+11   1.453992e+03   0.000000e+00     51s
+    9738    6.0046564e+11   0.000000e+00   0.000000e+00     52s
 
-Solved in 9738 iterations and 44.36 seconds (84.14 work units)
+Solved in 9738 iterations and 52.47 seconds (84.14 work units)
 Optimal objective  6.004656443e+11
 
-User-callback calls 9772, time in user-callback 0.06 sec
+User-callback calls 9774, time in user-callback 0.08 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1095,19 +1117,19 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -2.3871330e+25   1.172969e+33   1.655676e-05      0s
-    1260    6.0046664e+11   1.019575e+06   0.000000e+00      5s
-    2410    6.0046705e+11   2.946360e+04   0.000000e+00     10s
-    3490    6.0046711e+11   7.845749e+06   0.000000e+00     16s
-    4410    6.0046719e+11   3.344295e+06   0.000000e+00     20s
-    5470    6.0046747e+11   2.309170e+04   0.000000e+00     26s
-    6390    6.0046758e+11   3.094544e+03   0.000000e+00     30s
-    6759    6.0046759e+11   0.000000e+00   0.000000e+00     32s
+    1090    6.0046663e+11   2.033354e+05   0.000000e+00      5s
+    2250    6.0046705e+11   7.042610e+03   0.000000e+00     10s
+    3180    6.0046711e+11   5.271038e+05   0.000000e+00     15s
+    4270    6.0046719e+11   1.491742e+06   0.000000e+00     21s
+    5160    6.0046724e+11   6.562859e+04   0.000000e+00     26s
+    6070    6.0046755e+11   4.501384e+02   0.000000e+00     31s
+    6759    6.0046759e+11   0.000000e+00   0.000000e+00     35s
 
-Solved in 6759 iterations and 32.36 seconds (60.23 work units)
+Solved in 6759 iterations and 34.95 seconds (60.23 work units)
 Optimal objective  6.004675885e+11
 Warning: unscaled dual violation = 9.55733e-05 and residual = 2.02982e-06
 
-User-callback calls 6793, time in user-callback 0.04 sec
+User-callback calls 6793, time in user-callback 0.05 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1126,29 +1148,31 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -6.1524242e+26   3.219353e+33   7.338630e-04      0s
-    1445    6.0047205e+11   8.107268e+03   0.000000e+00      5s
-    2585    6.0047227e+11   6.397792e+03   0.000000e+00     10s
-    3705    6.0047242e+11   2.371859e+03   0.000000e+00     16s
-    4635    6.0047281e+11   6.322577e+04   0.000000e+00     20s
-    5815    6.0047319e+11   3.767316e+03   0.000000e+00     26s
-    6785    6.0047371e+11   1.403410e+05   0.000000e+00     30s
-    7695    6.0047396e+11   1.780174e+05   0.000000e+00     35s
-    8785    6.0047455e+11   6.869043e+04   0.000000e+00     41s
-    9745    6.0047480e+11   5.874532e+04   0.000000e+00     45s
-   10625    6.0047486e+11   6.463339e+05   0.000000e+00     50s
+    1445    6.0047205e+11   8.107268e+03   0.000000e+00      6s
+    2265    6.0047216e+11   8.415582e+04   0.000000e+00     10s
+    3215    6.0047239e+11   2.935988e+03   0.000000e+00     15s
+    4175    6.0047270e+11   5.799636e+04   0.000000e+00     20s
+    5105    6.0047314e+11   7.977336e+05   0.000000e+00     26s
+    5965    6.0047325e+11   3.221161e+03   0.000000e+00     30s
+    6935    6.0047375e+11   3.455788e+05   0.000000e+00     35s
+    7855    6.0047400e+11   1.327873e+04   0.000000e+00     40s
+    8785    6.0047455e+11   6.869043e+04   0.000000e+00     45s
+    9745    6.0047480e+11   5.874532e+04   0.000000e+00     50s
+   10625    6.0047486e+11   6.463339e+05   0.000000e+00     55s
 Warning: 1 variables dropped from basis
 Warning: switch to quad precision
-   11284    6.0047492e+11   1.950257e+03   0.000000e+00     56s
-   11894    6.0047496e+11   1.649624e+03   0.000000e+00     61s
-   12424    6.0047531e+11   5.662839e+04   0.000000e+00     65s
-   13094    6.0047554e+11   1.375356e+03   0.000000e+00     71s
-   13624    6.0047561e+11   1.028815e+02   0.000000e+00     75s
-   14114    6.0047562e+11   0.000000e+00   0.000000e+00     80s
+   11164    6.0047492e+11   1.086915e+04   0.000000e+00     60s
+   11774    6.0047495e+11   3.251115e+02   0.000000e+00     66s
+   12294    6.0047527e+11   3.390145e+04   0.000000e+00     70s
+   12964    6.0047553e+11   8.255463e+04   0.000000e+00     76s
+   13494    6.0047561e+11   4.547972e+02   0.000000e+00     80s
+   14109    6.0047562e+11   0.000000e+00   0.000000e+00     86s
+   14114    6.0047562e+11   0.000000e+00   0.000000e+00     86s
 
-Solved in 14114 iterations and 79.85 seconds (152.61 work units)
+Solved in 14114 iterations and 86.20 seconds (152.61 work units)
 Optimal objective  6.004756201e+11
 
-User-callback calls 14158, time in user-callback 0.09 sec
+User-callback calls 14160, time in user-callback 0.08 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1167,18 +1191,19 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -1.0517501e+25   5.069567e+32   2.483027e-05      0s
-    1400    6.0047888e+11   5.382575e+05   0.000000e+00      6s
-    2320    6.0047894e+11   5.426268e+05   0.000000e+00     10s
-    3250    6.0047934e+11   5.874448e+03   0.000000e+00     15s
-    4310    6.0047955e+11   3.311262e+05   0.000000e+00     20s
-    5360    6.0047969e+11   9.549007e+03   0.000000e+00     26s
-    6290    6.0047978e+11   2.145285e+02   0.000000e+00     30s
-    6499    6.0047978e+11   0.000000e+00   0.000000e+00     31s
+    1220    6.0047880e+11   2.995544e+05   0.000000e+00      6s
+    2020    6.0047894e+11   8.217078e+04   0.000000e+00     10s
+    2930    6.0047898e+11   4.250874e+04   0.000000e+00     16s
+    3870    6.0047949e+11   7.023101e+03   0.000000e+00     21s
+    4590    6.0047960e+11   3.191319e+04   0.000000e+00     25s
+    5520    6.0047971e+11   2.535974e+03   0.000000e+00     30s
+    6440    6.0047978e+11   9.255227e+03   0.000000e+00     36s
+    6499    6.0047978e+11   0.000000e+00   0.000000e+00     36s
 
-Solved in 6499 iterations and 31.40 seconds (58.96 work units)
+Solved in 6499 iterations and 36.24 seconds (58.96 work units)
 Optimal objective  6.004797840e+11
 
-User-callback calls 6530, time in user-callback 0.05 sec
+User-callback calls 6531, time in user-callback 0.05 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1197,23 +1222,24 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -2.9678877e+25   2.427842e+32   1.256338e-04      0s
-     980    6.0048418e+11   1.863078e+04   0.000000e+00      5s
-    2100    6.0048429e+11   6.381864e+04   0.000000e+00     11s
-    3050    6.0048439e+11   2.774747e+04   0.000000e+00     16s
-    3970    6.0048448e+11   2.435072e+04   0.000000e+00     21s
+     980    6.0048418e+11   1.863078e+04   0.000000e+00      6s
+    1790    6.0048427e+11   2.633652e+04   0.000000e+00     10s
+    2730    6.0048437e+11   2.606228e+04   0.000000e+00     16s
+    3510    6.0048445e+11   2.984956e+04   0.000000e+00     20s
 Warning: Markowitz tolerance tightened to 0.0625
-    4750    6.0048504e+11   1.435453e+05   0.000000e+00     25s
-    5700    6.0048521e+11   5.470551e+03   0.000000e+00     30s
-    6630    6.0048542e+11   5.183719e+03   0.000000e+00     35s
-    7580    6.0048545e+11   2.616699e+03   0.000000e+00     41s
-    8500    6.0048554e+11   3.383509e+03   0.000000e+00     46s
-    9250    6.0048555e+11   1.675353e+03   0.000000e+00     50s
-    9920    6.0048556e+11   0.000000e+00   0.000000e+00     55s
+    4290    6.0048494e+11   1.638525e+06   0.000000e+00     25s
+    5070    6.0048508e+11   7.255617e+04   0.000000e+00     31s
+    5700    6.0048521e+11   5.470551e+03   0.000000e+00     35s
+    6470    6.0048539e+11   2.967584e+03   0.000000e+00     40s
+    7420    6.0048545e+11   2.873492e+03   0.000000e+00     46s
+    8180    6.0048551e+11   7.073703e+03   0.000000e+00     50s
+    9110    6.0048555e+11   5.395372e+02   0.000000e+00     55s
+    9920    6.0048556e+11   0.000000e+00   0.000000e+00     60s
 
-Solved in 9920 iterations and 54.80 seconds (94.23 work units)
+Solved in 9920 iterations and 60.43 seconds (94.23 work units)
 Optimal objective  6.004855569e+11
 
-User-callback calls 9956, time in user-callback 0.08 sec
+User-callback calls 9957, time in user-callback 0.03 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1232,24 +1258,25 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0    1.0065297e+26   6.082857e+32   1.831587e-04      0s
-    1210    6.0048679e+11   4.149652e+03   0.000000e+00      6s
-    2140    6.0048689e+11   5.570055e+03   0.000000e+00     10s
-    3240    6.0048702e+11   4.707075e+04   0.000000e+00     16s
-    4190    6.0048718e+11   1.502639e+04   0.000000e+00     20s
-    5130    6.0048734e+11   3.926119e+03   0.000000e+00     25s
-    6000    6.0048738e+11   4.547635e+03   0.000000e+00     30s
-    7000    6.0048756e+11   1.597259e+05   0.000000e+00     35s
-    7960    6.0048768e+11   2.013269e+04   0.000000e+00     40s
-    8920    6.0048820e+11   1.030851e+04   0.000000e+00     45s
-    9810    6.0048823e+11   7.758684e+03   0.000000e+00     50s
-   10710    6.0048828e+11   4.704941e+02   0.000000e+00     55s
-   11560    6.0048830e+11   2.133004e+02   0.000000e+00     60s
-   12222    6.0048830e+11   0.000000e+00   0.000000e+00     65s
+    1050    6.0048677e+11   1.023513e+03   0.000000e+00      5s
+    1990    6.0048687e+11   1.748239e+04   0.000000e+00     11s
+    2920    6.0048697e+11   3.763314e+04   0.000000e+00     16s
+    3870    6.0048714e+11   3.175968e+04   0.000000e+00     21s
+    4670    6.0048722e+11   2.354585e+04   0.000000e+00     25s
+    5710    6.0048736e+11   8.874276e+03   0.000000e+00     31s
+    6560    6.0048743e+11   8.408151e+03   0.000000e+00     36s
+    7480    6.0048762e+11   1.668387e+03   0.000000e+00     41s
+    8280    6.0048775e+11   2.199035e+03   0.000000e+00     45s
+    9210    6.0048821e+11   8.217075e+03   0.000000e+00     51s
+    9960    6.0048824e+11   6.883481e+04   0.000000e+00     55s
+   10850    6.0048828e+11   2.167701e+03   0.000000e+00     61s
+   11560    6.0048830e+11   2.133004e+02   0.000000e+00     65s
+   12222    6.0048830e+11   0.000000e+00   0.000000e+00     69s
 
-Solved in 12222 iterations and 64.56 seconds (119.01 work units)
+Solved in 12222 iterations and 69.29 seconds (119.01 work units)
 Optimal objective  6.004883047e+11
 
-User-callback calls 12259, time in user-callback 0.09 sec
+User-callback calls 12260, time in user-callback 0.08 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1268,16 +1295,17 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -1.0761125e+27   1.773260e+32   2.123511e-03      0s
-    1100    6.0048840e+11   2.684023e+05   0.000000e+00      6s
-    2030    6.0049289e+11   7.871642e+04   0.000000e+00     10s
-    3020    6.0049365e+11   1.348312e+03   0.000000e+00     15s
-    3940    6.0049367e+11   1.219754e+03   0.000000e+00     20s
-    4750    6.0049367e+11   0.000000e+00   0.000000e+00     25s
+     940    6.0048838e+11   3.637818e+04   0.000000e+00      5s
+    1890    6.0049288e+11   1.084114e+05   0.000000e+00     10s
+    2850    6.0049365e+11   7.726262e+03   0.000000e+00     16s
+    3620    6.0049366e+11   2.155175e+03   0.000000e+00     20s
+    4380    6.0049367e+11   1.806533e+03   0.000000e+00     26s
+    4750    6.0049367e+11   0.000000e+00   0.000000e+00     29s
 
-Solved in 4750 iterations and 24.85 seconds (46.38 work units)
+Solved in 4750 iterations and 28.52 seconds (46.38 work units)
 Optimal objective  6.004936729e+11
 
-User-callback calls 4779, time in user-callback 0.02 sec
+User-callback calls 4780, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1296,9 +1324,9 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -6.3044688e+25   2.270323e+32   9.045236e-05      0s
-     526    6.0049368e+11   0.000000e+00   0.000000e+00      3s
+     526    6.0049368e+11   0.000000e+00   0.000000e+00      4s
 
-Solved in 526 iterations and 2.99 seconds (5.77 work units)
+Solved in 526 iterations and 3.71 seconds (5.77 work units)
 Optimal objective  6.004936756e+11
 
 User-callback calls 556, time in user-callback 0.00 sec
@@ -1320,23 +1348,26 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -1.9766582e+25   3.340882e+31   9.182215e-05      0s
-     990    6.0051399e+11   1.228077e+04   0.000000e+00      5s
-    2080    6.0051413e+11   8.118165e+04   0.000000e+00     11s
-    2930    6.0051420e+11   4.061691e+05   0.000000e+00     15s
-    3800    6.0051434e+11   6.472673e+05   0.000000e+00     20s
-    4640    6.0051441e+11   4.434505e+05   0.000000e+00     25s
-    5560    6.0051477e+11   4.684436e+04   0.000000e+00     30s
-    6650    6.0051525e+11   5.784862e+06   0.000000e+00     36s
-    7590    6.0051569e+11   1.231586e+05   0.000000e+00     41s
-    8540    6.0051605e+11   1.148890e+03   0.000000e+00     46s
-    9470    6.0051613e+11   3.257203e+05   0.000000e+00     51s
-   10410    6.0051626e+11   5.997595e+03   0.000000e+00     56s
-   10880    6.0051626e+11   0.000000e+00   0.000000e+00     58s
+     830    6.0051399e+11   8.878280e+04   0.000000e+00      5s
+    1620    6.0051402e+11   9.076866e+05   0.000000e+00     11s
+    2360    6.0051413e+11   8.597808e+04   0.000000e+00     16s
+    2930    6.0051420e+11   4.061691e+05   0.000000e+00     20s
+    3650    6.0051431e+11   2.505455e+05   0.000000e+00     25s
+    4360    6.0051439e+11   1.355844e+05   0.000000e+00     30s
+    5100    6.0051466e+11   7.000954e+04   0.000000e+00     35s
+    5860    6.0051504e+11   5.967477e+04   0.000000e+00     41s
+    6650    6.0051525e+11   5.784862e+06   0.000000e+00     46s
+    7430    6.0051561e+11   5.089049e+05   0.000000e+00     51s
+    8070    6.0051589e+11   2.687230e+04   0.000000e+00     56s
+    8840    6.0051605e+11   1.004641e+03   0.000000e+00     61s
+    9470    6.0051613e+11   3.257203e+05   0.000000e+00     65s
+   10250    6.0051626e+11   1.340858e+04   0.000000e+00     71s
+   10880    6.0051626e+11   0.000000e+00   0.000000e+00     75s
 
-Solved in 10880 iterations and 58.17 seconds (108.59 work units)
+Solved in 10880 iterations and 74.84 seconds (108.59 work units)
 Optimal objective  6.005162638e+11
 
-User-callback calls 10916, time in user-callback 0.07 sec
+User-callback calls 10919, time in user-callback 0.16 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1355,21 +1386,22 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -7.3264085e+24   1.365061e+32   1.228903e-05      0s
-    1080    6.0052499e+11   8.806884e+04   0.000000e+00      5s
-    1970    6.0052502e+11   2.453414e+04   0.000000e+00     10s
-    2920    6.0052508e+11   1.836105e+04   0.000000e+00     15s
-    3870    6.0052516e+11   6.389186e+04   0.000000e+00     20s
-    4850    6.0052532e+11   4.015619e+04   0.000000e+00     25s
-    5750    6.0052537e+11   2.506385e+05   0.000000e+00     30s
-    6690    6.0052542e+11   2.739367e+04   0.000000e+00     35s
-    7600    6.0052545e+11   1.794960e+03   0.000000e+00     40s
-    8480    6.0052546e+11   2.930065e+01   0.000000e+00     45s
-    8545    6.0052546e+11   0.000000e+00   0.000000e+00     46s
+     920    6.0052499e+11   1.187399e+04   0.000000e+00      5s
+    1680    6.0052500e+11   5.810288e+05   0.000000e+00     10s
+    2450    6.0052505e+11   2.219116e+04   0.000000e+00     15s
+    3240    6.0052509e+11   1.165771e+04   0.000000e+00     21s
+    3870    6.0052516e+11   6.389186e+04   0.000000e+00     25s
+    4540    6.0052525e+11   5.103114e+04   0.000000e+00     30s
+    5440    6.0052535e+11   5.764240e+05   0.000000e+00     36s
+    6210    6.0052540e+11   1.971110e+04   0.000000e+00     40s
+    7140    6.0052543e+11   9.697246e+03   0.000000e+00     46s
+    8040    6.0052545e+11   9.105478e+03   0.000000e+00     51s
+    8545    6.0052546e+11   0.000000e+00   0.000000e+00     54s
 
-Solved in 8545 iterations and 45.57 seconds (85.81 work units)
+Solved in 8545 iterations and 53.82 seconds (85.81 work units)
 Optimal objective  6.005254583e+11
 
-User-callback calls 8579, time in user-callback 0.07 sec
+User-callback calls 8580, time in user-callback 0.16 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1388,36 +1420,39 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -3.7868953e+25   4.347849e+32   9.307851e-05      0s
-    1040    6.0052967e+11   5.739075e+04   0.000000e+00      5s
-    1990    6.0052972e+11   1.436347e+03   0.000000e+00     10s
-    2960    6.0052975e+11   8.585989e+03   0.000000e+00     15s
-    3940    6.0053007e+11   6.346349e+04   0.000000e+00     21s
-    4910    6.0053017e+11   3.592380e+04   0.000000e+00     26s
-    5880    6.0053028e+11   6.674817e+04   0.000000e+00     31s
-    6710    6.0053034e+11   6.017990e+04   0.000000e+00     35s
-    7670    6.0053036e+11   5.590536e+03   0.000000e+00     41s
-    8440    6.0053037e+11   4.808769e+04   0.000000e+00     45s
-    9400    6.0053043e+11   5.181069e+04   0.000000e+00     51s
-   10200    6.0053045e+11   4.337648e+03   0.000000e+00     55s
-   11090    6.0053046e+11   4.357793e+04   0.000000e+00     60s
-   12060    6.0053050e+11   6.030641e+06   0.000000e+00     66s
-   12800    6.0053051e+11   1.675960e+04   0.000000e+00     70s
-   13720    6.0053055e+11   1.583745e+03   0.000000e+00     75s
-   14600    6.0053057e+11   8.854298e+03   0.000000e+00     81s
-   15380    6.0053059e+11   4.409510e+04   0.000000e+00     85s
-   16290    6.0053062e+11   2.721778e+03   0.000000e+00     90s
-   17230    6.0053062e+11   2.296127e+02   0.000000e+00     96s
-   18100    6.0053064e+11   1.308590e+04   0.000000e+00    101s
-   18860    6.0053064e+11   4.743659e+02   0.000000e+00    105s
-   19720    6.0053065e+11   2.877303e+04   0.000000e+00    110s
-   20620    6.0053065e+11   8.964487e+02   0.000000e+00    116s
-   21410    6.0053066e+11   6.187314e+01   0.000000e+00    121s
-   21808    6.0053066e+11   0.000000e+00   0.000000e+00    123s
+    1040    6.0052967e+11   5.739075e+04   0.000000e+00      6s
+    1830    6.0052972e+11   5.950188e+03   0.000000e+00     10s
+    2630    6.0052975e+11   7.047071e+03   0.000000e+00     15s
+    3630    6.0053006e+11   2.139604e+05   0.000000e+00     20s
+    4600    6.0053016e+11   6.835869e+04   0.000000e+00     26s
+    5390    6.0053022e+11   7.539759e+04   0.000000e+00     30s
+    6200    6.0053032e+11   1.810192e+04   0.000000e+00     35s
+    7030    6.0053035e+11   5.257066e+05   0.000000e+00     40s
+    7990    6.0053036e+11   5.858425e+04   0.000000e+00     46s
+    8600    6.0053039e+11   1.450847e+05   0.000000e+00     50s
+    9400    6.0053043e+11   5.181069e+04   0.000000e+00     55s
+   10200    6.0053045e+11   4.337648e+03   0.000000e+00     60s
+   11090    6.0053046e+11   4.357793e+04   0.000000e+00     66s
+   11880    6.0053048e+11   1.761754e+05   0.000000e+00     71s
+   12650    6.0053051e+11   5.892053e+04   0.000000e+00     76s
+   13430    6.0053055e+11   1.494865e+04   0.000000e+00     80s
+   14150    6.0053056e+11   1.960346e+04   0.000000e+00     85s
+   14920    6.0053059e+11   1.085203e+05   0.000000e+00     90s
+   15680    6.0053060e+11   6.866793e+04   0.000000e+00     96s
+   16440    6.0053062e+11   3.210646e+03   0.000000e+00    101s
+   17230    6.0053062e+11   2.296127e+02   0.000000e+00    106s
+   17960    6.0053064e+11   7.220249e+03   0.000000e+00    111s
+   18710    6.0053064e+11   2.499804e+02   0.000000e+00    115s
+   19440    6.0053065e+11   4.868719e+04   0.000000e+00    120s
+   20180    6.0053065e+11   1.127428e+03   0.000000e+00    126s
+   20940    6.0053066e+11   5.294063e+03   0.000000e+00    130s
+   21690    6.0053066e+11   1.049489e+01   0.000000e+00    135s
+   21808    6.0053066e+11   0.000000e+00   0.000000e+00    136s
 
-Solved in 21808 iterations and 123.17 seconds (223.10 work units)
+Solved in 21808 iterations and 136.11 seconds (223.10 work units)
 Optimal objective  6.005306581e+11
 
-User-callback calls 21857, time in user-callback 0.13 sec
+User-callback calls 21860, time in user-callback 0.16 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1436,22 +1471,23 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -1.0027056e+27   5.840244e+32   1.123318e-03      0s
-     960    6.0053089e+11   2.323360e+06   0.000000e+00      5s
+     960    6.0053089e+11   2.323360e+06   0.000000e+00      6s
 Warning: Markowitz tolerance tightened to 0.0625
-    1740    6.0053164e+11   2.913181e+06   0.000000e+00     10s
-    2580    6.0053184e+11   1.077397e+06   0.000000e+00     15s
-    3440    6.0053319e+11   4.492578e+04   0.000000e+00     20s
-    4200    6.0053330e+11   1.134736e+05   0.000000e+00     25s
-    5070    6.0053513e+11   1.135685e+06   0.000000e+00     31s
-    5830    6.0053574e+11   4.314659e+05   0.000000e+00     35s
-    6700    6.0053608e+11   1.932036e+05   0.000000e+00     41s
-    7470    6.0053611e+11   2.330679e+03   0.000000e+00     46s
-    7533    6.0053611e+11   0.000000e+00   0.000000e+00     46s
+    1590    6.0053158e+11   1.682136e+06   0.000000e+00     10s
+    2440    6.0053179e+11   5.551786e+05   0.000000e+00     16s
+    3160    6.0053210e+11   2.570561e+07   0.000000e+00     21s
+    3910    6.0053324e+11   5.297096e+04   0.000000e+00     26s
+    4650    6.0053429e+11   6.154662e+05   0.000000e+00     31s
+    5210    6.0053514e+11   8.155430e+05   0.000000e+00     35s
+    5990    6.0053574e+11   3.437379e+06   0.000000e+00     41s
+    6700    6.0053608e+11   1.932036e+05   0.000000e+00     46s
+    7310    6.0053608e+11   3.734473e+02   0.000000e+00     50s
+    7533    6.0053611e+11   0.000000e+00   0.000000e+00     52s
 
-Solved in 7533 iterations and 46.10 seconds (82.75 work units)
+Solved in 7533 iterations and 51.89 seconds (82.75 work units)
 Optimal objective  6.005361106e+11
 
-User-callback calls 7568, time in user-callback 0.05 sec
+User-callback calls 7569, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1471,13 +1507,14 @@ LP warm-start: use basis
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -1.4548851e+28   7.640000e+31   6.781011e-03      0s
 Warning: Markowitz tolerance tightened to 0.0625
-     940    6.0053684e+11   5.823437e+03   0.000000e+00      5s
-    1843    6.0053687e+11   0.000000e+00   0.000000e+00     11s
+     780    6.0053623e+11   4.073720e+03   0.000000e+00      5s
+    1540    6.0053686e+11   7.601298e+04   0.000000e+00     10s
+    1843    6.0053687e+11   0.000000e+00   0.000000e+00     12s
 
-Solved in 1843 iterations and 10.78 seconds (20.20 work units)
+Solved in 1843 iterations and 12.31 seconds (20.20 work units)
 Optimal objective  6.005368741e+11
 
-User-callback calls 1870, time in user-callback 0.01 sec
+User-callback calls 1871, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1496,17 +1533,18 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -1.5257092e+25   2.479036e+32   4.451176e-05      0s
-     900    6.0053704e+11   3.271393e+05   0.000000e+00      5s
-    1850    6.0053734e+11   3.176379e+05   0.000000e+00     11s
+     900    6.0053704e+11   3.271393e+05   0.000000e+00      6s
+    1690    6.0053724e+11   2.500573e+07   0.000000e+00     11s
 Warning: Markowitz tolerance tightened to 0.25
-    2660    6.0053793e+11   1.605562e+06   0.000000e+00     15s
-    3590    6.0053821e+11   7.189720e+04   0.000000e+00     21s
-    4338    6.0053897e+11   0.000000e+00   0.000000e+00     25s
+    2330    6.0053783e+11   9.627899e+04   0.000000e+00     15s
+    3120    6.0053812e+11   1.359898e+06   0.000000e+00     20s
+    3920    6.0053896e+11   9.050387e+01   0.000000e+00     25s
+    4338    6.0053897e+11   0.000000e+00   0.000000e+00     28s
 
-Solved in 4338 iterations and 25.25 seconds (48.16 work units)
+Solved in 4338 iterations and 28.05 seconds (48.16 work units)
 Optimal objective  6.005389659e+11
 
-User-callback calls 4368, time in user-callback 0.03 sec
+User-callback calls 4369, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1525,10 +1563,10 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -4.6156924e+25   1.002916e+32   2.549933e-04      0s
-    1165    6.0054036e+11   4.059022e+04   0.000000e+00      5s
+    1165    6.0054036e+11   4.059022e+04   0.000000e+00      6s
     1612    6.0054038e+11   0.000000e+00   0.000000e+00      8s
 
-Solved in 1612 iterations and 7.94 seconds (15.21 work units)
+Solved in 1612 iterations and 8.37 seconds (15.21 work units)
 Optimal objective  6.005403777e+11
 Warning: unscaled dual violation = 1.97643e-06 and residual = 2.30516e-05
 
@@ -1551,12 +1589,13 @@ LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -2.8599959e+24   1.178982e+32   7.963861e-05      0s
-     901    6.0054040e+11   0.000000e+00   0.000000e+00      5s
+     820    6.0054040e+11   7.263995e+00   0.000000e+00      6s
+     901    6.0054040e+11   0.000000e+00   0.000000e+00      6s
 
-Solved in 901 iterations and 5.35 seconds (10.46 work units)
+Solved in 901 iterations and 6.18 seconds (10.46 work units)
 Optimal objective  6.005403979e+11
 
-User-callback calls 933, time in user-callback 0.01 sec
+User-callback calls 934, time in user-callback 0.01 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -1577,7 +1616,7 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -4.0277832e+25   2.396342e+32   1.154117e-04      0s
      421    6.0054040e+11   0.000000e+00   0.000000e+00      3s
 
-Solved in 421 iterations and 2.63 seconds (6.01 work units)
+Solved in 421 iterations and 2.76 seconds (6.01 work units)
 Optimal objective  6.005403979e+11
 Warning: unscaled dual violation = 4.13453e-06 and residual = 1.83757e-05
 
@@ -1602,7 +1641,7 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -1.3399092e+24   6.587212e+31   6.197373e-05      0s
      412    6.0054040e+11   0.000000e+00   0.000000e+00      3s
 
-Solved in 412 iterations and 2.63 seconds (4.86 work units)
+Solved in 412 iterations and 2.67 seconds (4.86 work units)
 Optimal objective  6.005403979e+11
 
 User-callback calls 437, time in user-callback 0.00 sec
@@ -1626,7 +1665,7 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
        0   -1.8789195e+25   8.555402e+31   8.562580e-06      0s
      344    6.0054040e+11   0.000000e+00   0.000000e+00      2s
 
-Solved in 344 iterations and 2.13 seconds (3.78 work units)
+Solved in 344 iterations and 2.14 seconds (3.78 work units)
 Optimal objective  6.005403979e+11
 
 User-callback calls 369, time in user-callback 0.00 sec
@@ -1651,7 +1690,7 @@ Iteration    Objective       Primal Inf.    Dual Inf.      Time
 Warning: Markowitz tolerance tightened to 0.0625
      430    6.0054040e+11   0.000000e+00   0.000000e+00      3s
 
-Solved in 430 iterations and 2.71 seconds (5.07 work units)
+Solved in 430 iterations and 2.94 seconds (5.07 work units)
 Optimal objective  6.005403979e+11
 
 User-callback calls 458, time in user-callback 0.00 sec
