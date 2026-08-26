@@ -51,9 +51,10 @@ SCENARIOS (each varies a DIFFERENT dimension, so effects can be isolated):
 
 SOURCES:
     ERCOT 2025 LTDEF   https://www.ercot.com/files/docs/2025/04/08/ERCOT-2025-Long-Term-Load-Forecast-Report.pdf
-    ERCOT RPG          https://www.ercot.com/files/docs/2025/04/29/Long-term-Load-Forecast-RPG.pdf
-    EIA AEO 2023       https://www.eia.gov/outlooks/aeo/
-    NREL ATB 2024      https://atb.nrel.gov/electricity/2024/
+    EIA AEO            https://www.eia.gov/outlooks/aeo/narrative/
+    EIA Texas Profile  https://www.eia.gov/states/TX/analysis
+    ERCOT Market Outlk https://www.energyonline.com/reports/2025_ERCOT_Outlook.pdf
+    ERCOT Permian Plan https://www.rtoinsider.com/wp-content/uploads/2025/01/ERCOT-PB-Plan-Jul-24.pdf
 
 FIXED INVESTMENTS (fast runs):
     Set FIXED_INVESTMENT_DIR below to a folder containing pre-set

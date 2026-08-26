@@ -42,21 +42,27 @@ Hotspot zone weights (from ERCOT interconnection-request geography):
     301 Far West / Permian  0.11   (part of 45 West; Abilene facility ~1200 MW)
 
 Counts (ERCOT adjusted-vs-unadjusted split):
-    A_low  : 0    (EIA reference -- no data-center boom)
-    B_med  : 40   (~20 GW; ERCOT adjusts DC requests to ~49.8%)
-    C_fossil : 80   (~40 GW; TSP unadjusted, full requests)
+    A_low    : 0     (EIA reference -- no data-centre boom)
+    B_med    : 100   (50 GW)
+    C_fossil : 100   (50 GW)
+
+Counts are held equal across B and C so the data-centre layer stays an
+independent variable: B_dc vs B isolates data centres, while C_dc vs B_dc
+keeps the generation-mix comparison clean with the same added demand on
+both sides.
 
 SOURCES
-    Texas Tribune 2026 (86 North / 56 Central / 45 West):
-      https://www.texastribune.org/2026/06/08/texas-regulation-data-centers-electricity-power-water/
-    Newsweek/Houston Chronicle 2026 (top counties Ellis, Johnson, Dallas...):
-      https://www.newsweek.com/map-where-texas-greatest-data-center-demands-12058983
-    ENGIE 2026 (four hubs DFW/Austin/Houston/San Antonio; 606 centers):
-      https://www.engieresources.com/market-insight/texas-data-centers-the-new-large-load-shaping-ercot/
-    CleanSpark 2026 (300-600 MW project -> 500 MW central size):
-      https://www.barchart.com/story/news/37036905/
-    ERCOT 2025 LTDEF (DC requests adjusted to 49.8%):
-      https://www.ercot.com/files/docs/2025/04/08/ERCOT-2025-Long-Term-Load-Forecast-Report.pdf
+  Texas Tribune, "Texas regulation of data centers, electricity and water",
+  June 8 2026 -- 248 planned centres: 86 North Texas, 56 Central, 45 West;
+  Abilene facility up to 1,200 MW (upper bound on centre size).
+    https://www.texastribune.org/2026/06/08/texas-regulation-data-centers-electricity-power-water/
+
+  ERCOT 2025 Long-Term Load Forecast -- data-centre requests discounted to
+  49.8% in the adjusted forecast; adjusted 2030 peak 138,944 MW against a
+  TSP-provided unadjusted 208 GW. ERCOT cautions against planning to the
+  unadjusted values, which is why the counts here are deliberately
+  conservative (50 GW, below the ~52 GW adjusted large-load figure).
+    https://www.ercot.com/files/docs/2025/04/08/ERCOT-2025-Long-Term-Load-Forecast-Report.pdf
 
 ═══════════════════════════════════════════════════════════════════════════════
 USAGE (from project root):
@@ -89,8 +95,15 @@ DC_HOTSPOT_WEIGHTS = Dict(
     308 => 0.40, 305 => 0.25, 307 => 0.12, 303 => 0.12, 301 => 0.11,
 )
 
+# 100 centres x 500 MW = 50 GW added to every scenario that gets data centres.
+# Held equal across B and C so the data-centre layer stays an independent
+# variable: B_dc vs B isolates data centres, and C_dc vs B_dc keeps the
+# generation-mix comparison clean with the same added demand on both sides.
+# 50 GW sits between ERCOT's adjusted (~52 GW) and unadjusted (~122 GW)
+# large-load figures, and ERCOT itself cautions against planning to the
+# unadjusted values.
 DC_COUNTS = Dict(
-    "A_low" => 0, "B_med" => 50, "C_fossil" => 50,
+    "A_low" => 0, "B_med" => 100, "C_fossil" => 100,
 )
 
 DC_ZONE_NAMES = Dict(
@@ -193,16 +206,21 @@ function add_data_centers_to(simdir::String; mode::Symbol = :sidecar)
         open(cfg_path, "w") do io; TOML.print(io, cfg); end
     end
 
-    # Write the sidecar load file: bus_id => added per-unit load (flat)
-    load_pu = Dict(string(bid) => mw / DC_BASE_POWER for (bid, mw) in placement)
+    # Write the sidecar load file: bus_id => added load in MW (flat, 24/7).
+    #
+    # UNITS: values are in MW, NOT per-unit. update_decarbonization runs BEFORE
+    # convert_units, so at the point the hook applies this load, bus["load"] is
+    # still on the MW scale. Writing per-unit here previously caused each bus to
+    # receive 5 MW instead of 500 MW (a factor of 100 too small).
+    load_mw = Dict(string(bid) => mw for (bid, mw) in placement)
     open(joinpath(dc_scen_dir, "data_center_load.json"), "w") do io
         JSON.print(io, Dict(
             "scenario" => scen,
             "year" => year,
             "mw_per_center" => DC_MW_PER_CENTER,
             "total_mw" => isempty(placement) ? 0.0 : sum(values(placement)),
-            "note" => "flat 24/7 load added per bus, in per-unit (MW/100)",
-            "bus_added_pu" => load_pu,
+            "note" => "flat 24/7 load added per bus, in MW (pre-convert_units scale)",
+            "bus_added_mw" => load_mw,
         ), 2)
     end
     CSV.write(joinpath(dc_scen_dir, "data_center_placement.csv"), df)
@@ -243,18 +261,93 @@ function add_data_centers_to_all(; mode::Symbol = :sidecar)
     return made
 end
 
+
+# ── Verification ──────────────────────────────────────────────────────────────
+
+"""
+    verify_data_centers(dc_simdir)
+
+Checks whether the data-centre load actually reached the model for a _dc
+scenario. Compares total peak load in the _dc simdir's data.json against its
+base scenario. Run this AFTER solving both.
+
+If the two match, the hook in update_decarbonization is not firing and the
+_dc scenario is solving identically to its base -- which is why the figures
+would look the same.
+"""
+function verify_data_centers(dc_simdir::String)
+    parts = splitpath(rstrip(dc_simdir, ['/','\\']))
+    scen  = parts[end-1]
+    year  = parts[end]
+    endswith(scen, "_dc") || error("$dc_simdir is not a _dc scenario")
+    base_simdir = joinpath(DC_SCEN_DIR, replace(scen, "_dc" => ""), year)
+
+    function peak_load(sd)
+        p = joinpath(sd, "data.json")
+        isfile(p) || return nothing
+        d = JSON.parsefile(p)
+        tot = 0.0
+        for (_, bus) in d["bus"]
+            for (_, prof) in bus["load"]
+                isempty(prof) || (tot = max(tot, 0.0); nothing)
+            end
+        end
+        # sum of each bus's peak, in MW
+        s = 0.0
+        for (_, bus) in d["bus"]
+            m = 0.0
+            for (_, prof) in bus["load"]
+                isempty(prof) || (m = max(m, maximum(prof)))
+            end
+            s += m
+        end
+        return s * DC_BASE_POWER
+    end
+
+    lb = peak_load(base_simdir)
+    ld = peak_load(dc_simdir)
+
+    println("=" ^ 62)
+    println("DATA-CENTRE VERIFICATION — $scen/$year")
+    println("=" ^ 62)
+    if lb === nothing || ld === nothing
+        println("  Missing data.json — solve both scenarios first.")
+        println("    base: $base_simdir")
+        println("    dc:   $dc_simdir")
+        return nothing
+    end
+
+    diff = ld - lb
+    expected = get(DC_COUNTS, replace(scen, "_dc" => ""), 0) * DC_MW_PER_CENTER
+    println("  Base peak load      $(round(lb)) MW")
+    println("  With data centres   $(round(ld)) MW")
+    println("  Difference          $(round(diff)) MW   (expected ~$(round(expected)) MW)")
+    if abs(diff) < 1.0
+        println("\n  ✗ NO DIFFERENCE — the data-centre load is not reaching the model.")
+        println("    Check that the hook below is present at the end of")
+        println("    update_decarbonization in decarbonization.jl:\n")
+        println(DATA_CENTER_HOOK)
+    elseif abs(diff - expected) / max(expected, 1) > 0.1
+        println("\n  ⚠ Difference does not match the expected added load.")
+    else
+        println("\n  ✓ Data-centre load is being applied correctly.")
+    end
+    println("=" ^ 62)
+    return diff
+end
+
 # ── The optional 3-line hook (only needed for mode=:sidecar solving) ─────────
 
-const DATA_CENTER_HOOK = raw"""
+DATA_CENTER_HOOK = raw"""
     # --- data-center nodal load (added by add_data_centers.jl sidecar) ---
     if get(toml_data, "data_centers", false) && haskey(toml_data, "data_center_load_file")
         dcf = toml_data["data_center_load_file"]
         if isfile(dcf)
-            dc = JSON.parsefile(dcf)["bus_added_pu"]
-            for (bid, add_pu) in dc
+            dc = JSON.parsefile(dcf)["bus_added_mw"]
+            for (bid, add_mw) in dc
                 haskey(data["bus"], bid) || continue
                 for (rep, prof) in data["bus"][bid]["load"]
-                    data["bus"][bid]["load"][rep] = prof .+ Float64(add_pu)
+                    data["bus"][bid]["load"][rep] = prof .+ Float64(add_mw)
                 end
             end
         end

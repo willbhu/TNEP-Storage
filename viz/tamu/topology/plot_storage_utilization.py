@@ -13,12 +13,24 @@ Per meeting notes 8/12:
 METHODOLOGY
 ═══════════════════════════════════════════════════════════════════════════════
 energy.csv has Charge and Discharge per node per hour, but NO state-of-charge
-column. SOC is therefore reconstructed by integrating over the day:
+column. SOC is therefore reconstructed by integrating over the day, accounting
+for round-trip efficiency:
 
-    SOC(t) = cumsum( Charge(t) - Discharge(t) )
+    SOC(t) = cumsum( Charge(t) x eta_c  -  Discharge(t) / eta_d )
 
-offset so the minimum is zero (the model's SOC has a free starting point, so
-only the SWING matters for sizing -- that swing is the energy actually cycled).
+Charging adds only eta_c per MWh drawn from the grid; discharging removes more
+than it delivers. A raw charge-minus-discharge sum ignores this and understates
+how much energy the reservoir actually has to hold. Only the SWING (max - min)
+matters for sizing, since the model's SOC has a free starting point.
+
+TWO DISTINCT QUANTITIES -- do not conflate them:
+    SIZING     max(SOC swing, peak discharge x 4h) -- how big the unit must be
+    THROUGHPUT total MWh discharged -- how hard it is worked over the horizon
+A node can be large but rarely used, or small but cycled constantly.
+
+UTILIZATION is computed PER NODE against that node's own installed capacity,
+then summarised as a median. A fleet-wide required/installed ratio hides the
+fact that most nodes may sit idle while a few are saturated.
 
 SIZING METRIC -- which rating binds?
     energy_need = max SOC swing over the day                (MWh)
@@ -74,8 +86,11 @@ simdir = sys.argv[1]
 _parts = os.path.normpath(simdir).split(os.sep)
 scenario_label = " / ".join(_parts[-2:]) if len(_parts) >= 2 else os.path.basename(simdir)
 
-BASE_MW       = 100.0   # per-unit -> MW
-STORAGE_HOURS = 4.0     # standard grid-battery duration for the power/energy comparison
+BASE_MW        = 100.0  # per-unit -> MW
+STORAGE_HOURS  = 4.0    # standard grid-battery duration for the power/energy comparison
+ROUND_TRIP_EFF = 0.85   # round-trip efficiency; SOC gains eta_c per MWh charged
+CHARGE_EFF     = ROUND_TRIP_EFF ** 0.5   # one-way charging efficiency
+DISCHARGE_EFF  = ROUND_TRIP_EFF ** 0.5   # one-way discharging efficiency
 
 out_dir    = simdir
 output_dir = os.path.join(out_dir, "output")
@@ -100,10 +115,22 @@ if not rep_days:
 # storage must be sized for the hardest day it has to serve.
 
 node_meta   = {}   # node -> (name, lat, lon)
-energy_need = {}   # node -> max SOC swing (MWh) across days
-power_need  = {}   # node -> max discharge (MW) across days
-cycled_mwh  = {}   # node -> total MWh discharged (summed over all days)
+energy_need = {}   # node -> max SOC swing (MWh) across days  [sizing]
+power_need  = {}   # node -> max discharge (MW) across days   [sizing]
+cycled_mwh  = {}   # node -> total MWh discharged over all days [throughput]
 total_shed  = 0.0
+
+# Installed capacity per node, so utilization can be computed node by node
+# rather than as an aggregate ratio (which hides nodes that sit idle).
+installed_by_node = {}
+_inv_path = os.path.join(output_dir, "storage_investments.csv")
+if os.path.isfile(_inv_path):
+    _inv = pd.read_csv(_inv_path)
+    if {"Node_Index", "Storage_Energy"}.issubset(_inv.columns):
+        installed_by_node = {
+            int(r.Node_Index): float(r.Storage_Energy) * BASE_MW
+            for r in _inv.itertuples()
+        }
 
 for day in rep_days:
     path = os.path.join(output_dir, day, "energy.csv")
@@ -123,8 +150,11 @@ for day in rep_days:
         if charge.sum() == 0 and discharge.sum() == 0:
             continue   # storage idle at this node on this day
 
-        # Reconstruct SOC by integration; only the swing matters for sizing
-        soc = np.cumsum(charge - discharge)
+        # Reconstruct SOC by integration. Charging adds eta_c per MWh drawn from
+        # the grid; discharging removes MWh/eta_d from the reservoir. Ignoring
+        # efficiency (as a raw charge-minus-discharge sum does) understates the
+        # energy the reservoir actually has to hold.
+        soc = np.cumsum(charge * CHARGE_EFF - discharge / DISCHARGE_EFF)
         swing = float(soc.max() - soc.min())
 
         node_meta.setdefault(
@@ -149,17 +179,22 @@ for node, (name, lat, lon) in node_meta.items():
     required = max(e_need, p_as_energy)
     limiting = "energy" if e_need >= p_as_energy else "power"
 
+    inst = installed_by_node.get(node, float("nan"))
+    util_pct = (100.0 * required / inst) if inst and inst > 0 else float("nan")
+
     rows.append({
-        "Node_Index":        node,
-        "Node_Name":         name,
-        "Lat":               lat,
-        "Lon":               lon,
-        "Energy_Need_MWh":   round(e_need, 1),
-        "Peak_Discharge_MW": round(p_need, 1),
+        "Node_Index":          node,
+        "Node_Name":           name,
+        "Lat":                 lat,
+        "Lon":                 lon,
+        "Energy_Need_MWh":     round(e_need, 1),
+        "Peak_Discharge_MW":   round(p_need, 1),
         "Power_As_Energy_MWh": round(p_as_energy, 1),
-        "Required_MWh":      round(required, 1),
-        "Cycled_MWh":        round(cycled_mwh.get(node, 0.0), 1),
-        "Limiting_Factor":   limiting,
+        "Required_MWh":        round(required, 1),
+        "Cycled_MWh":          round(cycled_mwh.get(node, 0.0), 1),
+        "Installed_MWh":       round(inst, 1) if inst == inst else "",
+        "Utilization_Pct":     round(util_pct, 1) if util_pct == util_pct else "",
+        "Limiting_Factor":     limiting,
     })
 
 util = pd.DataFrame(rows).sort_values("Required_MWh", ascending=False)
@@ -180,23 +215,43 @@ n_active       = len(util)
 n_power_lim    = int((util["Limiting_Factor"] == "power").sum())
 n_energy_lim   = int((util["Limiting_Factor"] == "energy").sum())
 
-print("=" * 68)
+n_installed = len(installed_by_node) if installed_by_node else 0
+n_idle      = max(n_installed - n_active, 0)
+util_series = pd.to_numeric(util["Utilization_Pct"], errors="coerce").dropna()
+
+print("=" * 72)
 print(f"STORAGE UTILIZATION — {scenario_label}")
-print("=" * 68)
+print("=" * 72)
+print(f"  Representative days analysed: {len(rep_days)}")
+print(f"  Round-trip efficiency assumed: {ROUND_TRIP_EFF:.0%}")
+print()
+print("  CAPACITY")
 if installed_total is not None:
-    print(f"  Installed capacity:      {installed_total:>14,.0f} MWh")
-print(f"  Actually required:       {used_total:>14,.0f} MWh   (sum of per-node max need)")
-print(f"  Total energy cycled:     {cycled_total:>14,.0f} MWh   (sum of all discharge)")
+    print(f"    Installed                {installed_total:>14,.0f} MWh  across {n_installed:,} nodes")
+print(f"    Required (sizing)        {used_total:>14,.0f} MWh  sum of per-node max(SOC swing, P x {STORAGE_HOURS:.0f}h)")
 if installed_total and installed_total > 0:
-    print(f"  Utilization:             {100 * used_total / installed_total:>13.1f} %")
+    print(f"    Fleet-wide ratio         {100 * used_total / installed_total:>13.1f} %  required / installed")
 print()
-print(f"  Nodes with active storage: {n_active:,}")
-print(f"    power-limited  (needs bigger discharge rate): {n_power_lim:,}")
-print(f"    energy-limited (needs more MWh):              {n_energy_lim:,}")
+print("  THROUGHPUT")
+print(f"    Energy discharged        {cycled_total:>14,.0f} MWh  summed over all days and nodes")
+if installed_total and installed_total > 0 and len(rep_days) > 0:
+    cycles = cycled_total / installed_total / len(rep_days)
+    print(f"    Equivalent full cycles   {cycles:>13.2f}    per representative day")
 print()
-print(f"  Total load shed (Energy_Imbalance): {total_shed:,.1f} MWh", end="")
+print("  NODE-LEVEL")
+print(f"    Active (any cycling)     {n_active:>14,}")
+if n_installed:
+    print(f"    Idle (never cycled)      {n_idle:>14,}  {100*n_idle/n_installed:.1f}% of nodes with storage")
+if len(util_series):
+    print(f"    Median node utilization  {util_series.median():>13.1f} %")
+    print(f"    Max node utilization     {util_series.max():>13.1f} %")
+print(f"    Power-limited            {n_power_lim:>14,}  would need a higher discharge rate")
+print(f"    Energy-limited           {n_energy_lim:>14,}  would need more MWh")
+print()
+print("  VALIDATION")
+print(f"    Load shed                {total_shed:>14,.1f} MWh", end="")
 print("   ✓ none" if abs(total_shed) < 1e-6 else "   ⚠ NONZERO")
-print("=" * 68)
+print("=" * 72)
 print(f"\nTop 10 nodes by required storage:")
 print(util.head(10)[["Node_Index", "Node_Name", "Required_MWh",
                      "Peak_Discharge_MW", "Limiting_Factor"]].to_string(index=False))

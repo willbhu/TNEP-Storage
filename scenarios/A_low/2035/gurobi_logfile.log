@@ -1,11 +1,11 @@
 
-Gurobi 11.0.3 (win64) logging started Wed Aug 19 19:11:54 2026
+Gurobi 11.0.3 (win64) logging started Wed Aug 26 18:01:34 2026
 
 Set parameter LogFile to value "scenarios/A_low/2035\gurobi_logfile.log"
 Set parameter MIPGap to value 0.01
 Set parameter TimeLimit to value 84600
 
-Gurobi 11.0.3 (win64) logging started Wed Aug 19 19:11:54 2026
+Gurobi 11.0.3 (win64) logging started Wed Aug 26 18:01:34 2026
 
 Set parameter LogFile to value "scenarios/A_low/2035\gurobi_logfile.log"
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
@@ -14,7 +14,7 @@ CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
 Optimize a model with 201230 rows, 211558 columns and 645558 nonzeros
-Model fingerprint: 0x81f653d2
+Model fingerprint: 0x11affea0
 Coefficient statistics:
   Matrix range     [6e-01, 3e+00]
   Objective range  [3e+02, 2e+09]
@@ -24,7 +24,7 @@ Warning: Model contains large objective coefficients
          Consider reformulating model or setting NumericFocus parameter
          to avoid numerical issues.
 Presolve removed 153206 rows and 65166 columns
-Presolve time: 0.31s
+Presolve time: 0.23s
 Presolved: 48024 rows, 146392 columns, 288392 nonzeros
 
 Concurrent LP optimizer: primal simplex, dual simplex, and barrier
@@ -38,31 +38,31 @@ Barrier statistics:
  Factor Ops : 1.252e+04 (less than 1 second per iteration)
  Threads    : 1
 
-Barrier performed 0 iterations in 0.40 seconds (0.29 work units)
+Barrier performed 0 iterations in 0.26 seconds (0.29 work units)
 Barrier solve interrupted - model solved by another algorithm
 
 
 Solved with dual simplex
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-      32    5.8999130e+11   0.000000e+00   0.000000e+00      0s
+      30    5.8960398e+11   0.000000e+00   0.000000e+00      0s
 
 Use crossover to convert LP symmetric solution to basic solution...
 Crossover log...
 
        0 DPushes remaining with DInf 0.0000000e+00                 0s
 
-   16800 PPushes remaining with PInf 0.0000000e+00                 1s
-       0 PPushes remaining with PInf 0.0000000e+00                 1s
+   13993 PPushes remaining with PInf 0.0000000e+00                 0s
+       0 PPushes remaining with PInf 0.0000000e+00                 0s
 
-  Push phase complete: Pinf 0.0000000e+00, Dinf 3.7252903e-09      1s
+  Push phase complete: Pinf 0.0000000e+00, Dinf 1.8626451e-09      0s
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-   24833    5.8999130e+11   0.000000e+00   0.000000e+00      1s
+   19219    5.8960398e+11   0.000000e+00   0.000000e+00      1s
 
-Solved in 24833 iterations and 1.13 seconds (1.17 work units)
-Optimal objective  5.899913027e+11
+Solved in 19219 iterations and 0.57 seconds (0.50 work units)
+Optimal objective  5.896039777e+11
 
-User-callback calls 24919, time in user-callback 0.00 sec
+User-callback calls 19306, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
@@ -80,20 +80,19 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.8999130e+11   2.189304e+02   0.000000e+00      0s
-    6690    5.9049306e+11   7.955258e+01   0.000000e+00      5s
-    7525    5.9049366e+11   0.000000e+00   0.000000e+00      6s
+       0    5.8960398e+11   2.183154e+02   0.000000e+00      0s
+    4601    5.9010653e+11   0.000000e+00   0.000000e+00      4s
 
-Solved in 7525 iterations and 5.71 seconds (9.03 work units)
-Optimal objective  5.904936602e+11
+Solved in 4601 iterations and 3.71 seconds (6.81 work units)
+Optimal objective  5.901065338e+11
 
-User-callback calls 7551, time in user-callback 0.03 sec
+User-callback calls 4626, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201294 rows, 211558 columns and 893199 nonzeros
+Optimize a model with 201294 rows, 211558 columns and 876632 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -105,20 +104,20 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9049366e+11   9.873694e+01   0.000000e+00      0s
-    7640    5.9086490e+11   2.398766e+01   0.000000e+00      5s
-    8365    5.9086508e+11   0.000000e+00   0.000000e+00      6s
+       0    5.9010653e+11   8.606376e+01   0.000000e+00      0s
+    3160    5.9045629e+11   1.592090e+02   0.000000e+00      5s
+    3212    5.9045630e+11   0.000000e+00   0.000000e+00      5s
 
-Solved in 8365 iterations and 6.26 seconds (16.90 work units)
-Optimal objective  5.908650833e+11
+Solved in 3212 iterations and 5.21 seconds (9.36 work units)
+Optimal objective  5.904562970e+11
 
-User-callback calls 8391, time in user-callback 0.04 sec
+User-callback calls 3238, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201326 rows, 211558 columns and 972381 nonzeros
+Optimize a model with 201326 rows, 211558 columns and 986854 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -130,20 +129,20 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9086508e+11   9.287680e+01   0.000000e+00      0s
-    5320    5.9097746e+11   2.331161e+02   0.000000e+00      5s
-    6601    5.9099966e+11   0.000000e+00   0.000000e+00      6s
+       0    5.9045630e+11   9.702111e+01   0.000000e+00      0s
+    1416    5.9066057e+11   0.000000e+00   0.000000e+00      1s
 
-Solved in 6601 iterations and 6.47 seconds (17.37 work units)
-Optimal objective  5.909996613e+11
+Solved in 1416 iterations and 1.46 seconds (2.61 work units)
+Optimal objective  5.906605669e+11
+Warning: unscaled dual violation = 3.71192e-06 and residual = 3.71192e-06
 
-User-callback calls 6627, time in user-callback 0.04 sec
+User-callback calls 1446, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201358 rows, 211558 columns and 1075835 nonzeros
+Optimize a model with 201358 rows, 211558 columns and 1097091 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -155,19 +154,19 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9099966e+11   6.160590e+01   0.000000e+00      0s
-    5100    5.9108257e+11   0.000000e+00   0.000000e+00      5s
+       0    5.9066057e+11   7.251536e+01   0.000000e+00      0s
+    1990    5.9076800e+11   0.000000e+00   0.000000e+00      2s
 
-Solved in 5100 iterations and 4.82 seconds (13.55 work units)
-Optimal objective  5.910825664e+11
+Solved in 1990 iterations and 1.99 seconds (5.10 work units)
+Optimal objective  5.907679993e+11
 
-User-callback calls 5125, time in user-callback 0.00 sec
+User-callback calls 2015, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201390 rows, 211558 columns and 1183167 nonzeros
+Optimize a model with 201390 rows, 211558 columns and 1236774 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -179,20 +178,19 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9108257e+11   4.568127e+01   0.000000e+00      0s
-    3954    5.9113669e+11   0.000000e+00   0.000000e+00      5s
+       0    5.9076800e+11   5.761044e+01   0.000000e+00      0s
+    3437    5.9079895e+11   0.000000e+00   0.000000e+00      4s
 
-Solved in 3954 iterations and 5.10 seconds (13.42 work units)
-Optimal objective  5.911366928e+11
-Warning: unscaled dual violation = 1.65275e-06 and residual = 1.11506e-05
+Solved in 3437 iterations and 4.50 seconds (11.16 work units)
+Optimal objective  5.907989470e+11
 
-User-callback calls 3981, time in user-callback 0.02 sec
+User-callback calls 3462, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201422 rows, 211558 columns and 1276787 nonzeros
+Optimize a model with 201422 rows, 211558 columns and 1357542 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -204,20 +202,20 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9113669e+11   5.615479e+01   0.000000e+00      0s
-    2920    5.9115239e+11   3.774943e+02   0.000000e+00      5s
-    3562    5.9115295e+11   0.000000e+00   0.000000e+00      6s
+       0    5.9079895e+11   3.795527e+01   0.000000e+00      0s
+    3100    5.9082893e+11   4.475187e+03   0.000000e+00      5s
+    5622    5.9083939e+11   0.000000e+00   0.000000e+00     10s
 
-Solved in 3562 iterations and 6.02 seconds (15.36 work units)
-Optimal objective  5.911529520e+11
+Solved in 5622 iterations and 9.54 seconds (20.89 work units)
+Optimal objective  5.908393888e+11
 
-User-callback calls 3588, time in user-callback 0.00 sec
+User-callback calls 5648, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201454 rows, 211558 columns and 1395654 nonzeros
+Optimize a model with 201454 rows, 211558 columns and 1509048 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -229,21 +227,21 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9115295e+11   3.246652e+01   0.000000e+00      0s
-    3590    5.9118208e+11   5.409779e+03   0.000000e+00      5s
-    4220    5.9118246e+11   0.000000e+00   0.000000e+00      6s
+       0    5.9083939e+11   4.918376e+01   0.000000e+00      0s
+    2380    5.9086190e+11   1.916259e+06   0.000000e+00      5s
+    5240    5.9086430e+11   1.545148e+03   0.000000e+00     10s
+    7984    5.9087139e+11   0.000000e+00   0.000000e+00     15s
 
-Solved in 4220 iterations and 5.62 seconds (14.50 work units)
-Optimal objective  5.911824615e+11
-Warning: unscaled dual violation = 6.91728e-06 and residual = 4.03972e-05
+Solved in 7984 iterations and 15.35 seconds (28.74 work units)
+Optimal objective  5.908713869e+11
 
-User-callback calls 4249, time in user-callback 0.00 sec
+User-callback calls 8013, time in user-callback 0.03 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201486 rows, 211558 columns and 1541000 nonzeros
+Optimize a model with 201486 rows, 211558 columns and 1613579 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -255,20 +253,20 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.1980253e+24   1.242493e+32   2.239349e-05      0s
-    2375    5.9120285e+11   1.403005e+03   0.000000e+00      5s
-    3730    5.9121106e+11   0.000000e+00   0.000000e+00      9s
+       0   -6.8983264e+23   2.000554e+31   1.586508e-06      0s
+    2431    5.9092400e+11   7.208835e+01   0.000000e+00      5s
+    3179    5.9092428e+11   0.000000e+00   0.000000e+00      7s
 
-Solved in 3730 iterations and 8.63 seconds (21.54 work units)
-Optimal objective  5.912110610e+11
+Solved in 3179 iterations and 7.40 seconds (13.78 work units)
+Optimal objective  5.909242815e+11
 
-User-callback calls 3760, time in user-callback 0.02 sec
+User-callback calls 3209, time in user-callback 0.03 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201518 rows, 211558 columns and 1662662 nonzeros
+Optimize a model with 201518 rows, 211558 columns and 1717062 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -280,19 +278,21 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9121106e+11   3.717995e+01   0.000000e+00      0s
-    3586    5.9123878e+11   0.000000e+00   0.000000e+00      5s
+       0    5.9092428e+11   3.328879e+01   0.000000e+00      0s
+    2760    5.9095950e+11   1.960295e+03   0.000000e+00      5s
+    4760    5.9095974e+11   8.092834e+02   0.000000e+00     10s
+    6035    5.9096016e+11   0.000000e+00   0.000000e+00     12s
 
-Solved in 3586 iterations and 4.77 seconds (13.74 work units)
-Optimal objective  5.912387826e+11
+Solved in 6035 iterations and 12.37 seconds (22.67 work units)
+Optimal objective  5.909601615e+11
 
-User-callback calls 3613, time in user-callback 0.00 sec
+User-callback calls 6062, time in user-callback 0.03 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201550 rows, 211558 columns and 1750890 nonzeros
+Optimize a model with 201550 rows, 211558 columns and 1770923 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -304,21 +304,19 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9123878e+11   3.066765e+01   0.000000e+00      0s
-    4000    5.9127407e+11   1.479510e+04   0.000000e+00      5s
-    5960    5.9127425e+11   2.675307e+02   0.000000e+00     10s
-    6966    5.9127425e+11   0.000000e+00   0.000000e+00     13s
+       0    5.9096016e+11   3.323786e+01   0.000000e+00      0s
+    1810    5.9099238e+11   0.000000e+00   0.000000e+00      5s
 
-Solved in 6966 iterations and 13.18 seconds (34.07 work units)
-Optimal objective  5.912742533e+11
+Solved in 1810 iterations and 4.56 seconds (8.25 work units)
+Optimal objective  5.909923754e+11
 
-User-callback calls 6993, time in user-callback 0.04 sec
+User-callback calls 1835, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201582 rows, 211558 columns and 1822195 nonzeros
+Optimize a model with 201582 rows, 211558 columns and 1859968 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -330,21 +328,19 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9127425e+11   3.166798e+01   0.000000e+00      0s
-    2360    5.9129597e+11   3.582048e+02   0.000000e+00      5s
-    4140    5.9129702e+11   2.570387e+03   0.000000e+00     10s
-    5209    5.9129723e+11   0.000000e+00   0.000000e+00     13s
+       0    5.9099238e+11   3.680247e+01   0.000000e+00      0s
+    1196    5.9100170e+11   0.000000e+00   0.000000e+00      4s
 
-Solved in 5209 iterations and 13.40 seconds (34.93 work units)
-Optimal objective  5.912972281e+11
+Solved in 1196 iterations and 3.70 seconds (6.87 work units)
+Optimal objective  5.910017029e+11
 
-User-callback calls 5236, time in user-callback 0.01 sec
+User-callback calls 1223, time in user-callback 0.01 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201614 rows, 211558 columns and 1910937 nonzeros
+Optimize a model with 201614 rows, 211558 columns and 1967876 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -356,20 +352,22 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9129723e+11   2.491823e+01   0.000000e+00      0s
-    2300    5.9130684e+11   2.043043e+04   0.000000e+00      5s
-    3779    5.9130727e+11   0.000000e+00   0.000000e+00      9s
+       0    7.8527874e+22   2.132133e+31   1.539942e-06      0s
+    1181    5.9100485e+11   2.870365e+02   0.000000e+00      5s
+    1741    5.9100517e+11   1.232648e+02   0.000000e+00     10s
+    2441    5.9100542e+11   1.611269e+03   0.000000e+00     16s
+    3065    5.9100571e+11   0.000000e+00   0.000000e+00     20s
 
-Solved in 3779 iterations and 8.57 seconds (22.78 work units)
-Optimal objective  5.913072735e+11
+Solved in 3065 iterations and 20.19 seconds (21.44 work units)
+Optimal objective  5.910057080e+11
 
-User-callback calls 3805, time in user-callback 0.01 sec
+User-callback calls 3097, time in user-callback 0.02 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201646 rows, 211558 columns and 2002551 nonzeros
+Optimize a model with 201646 rows, 211558 columns and 2042766 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -381,22 +379,19 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9130727e+11   1.257749e+01   0.000000e+00      0s
-    1890    5.9131295e+11   1.266465e+04   0.000000e+00      5s
-    3490    5.9131296e+11   1.538382e+04   0.000000e+00     10s
-    5200    5.9131342e+11   2.794427e+00   0.000000e+00     15s
-    5448    5.9131342e+11   0.000000e+00   0.000000e+00     17s
+       0    5.9100571e+11   2.425831e+01   0.000000e+00      0s
+     502    5.9101026e+11   0.000000e+00   0.000000e+00      3s
 
-Solved in 5448 iterations and 16.78 seconds (39.81 work units)
-Optimal objective  5.913134212e+11
+Solved in 502 iterations and 2.58 seconds (3.54 work units)
+Optimal objective  5.910102590e+11
 
-User-callback calls 5476, time in user-callback 0.02 sec
+User-callback calls 528, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201670 rows, 211558 columns and 2052721 nonzeros
+Optimize a model with 201678 rows, 211558 columns and 2166120 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -408,21 +403,21 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9131342e+11   8.904294e+00   0.000000e+00      0s
-    1570    5.9131557e+11   6.153032e+01   0.000000e+00      5s
-    2830    5.9131558e+11   4.588198e+00   0.000000e+00     10s
-    2948    5.9131559e+11   0.000000e+00   0.000000e+00     11s
+       0    5.9101026e+11   3.052930e+00   0.000000e+00      0s
+    1230    5.9101237e+11   3.021486e+03   0.000000e+00      5s
+    2590    5.9101246e+11   1.610138e+04   0.000000e+00     10s
+    3454    5.9101256e+11   0.000000e+00   0.000000e+00     14s
 
-Solved in 2948 iterations and 10.80 seconds (21.81 work units)
-Optimal objective  5.913155869e+11
+Solved in 3454 iterations and 13.54 seconds (26.68 work units)
+Optimal objective  5.910125592e+11
 
-User-callback calls 2975, time in user-callback 0.07 sec
+User-callback calls 3482, time in user-callback 0.06 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201675 rows, 211558 columns and 2056728 nonzeros
+Optimize a model with 201689 rows, 211558 columns and 2198864 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -434,20 +429,20 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0    5.9131559e+11   3.910008e+00   0.000000e+00      0s
-      43    5.9131612e+11   0.000000e+00   0.000000e+00      0s
+       0    5.9101256e+11   1.409136e+00   0.000000e+00      0s
+    1440    5.9101270e+11   2.790808e+01   0.000000e+00      5s
+    2674    5.9101272e+11   0.000000e+00   0.000000e+00      8s
 
-Solved in 43 iterations and 0.39 seconds (0.73 work units)
-Optimal objective  5.913161198e+11
-Warning: unscaled dual violation = 3.62976e-06 and residual = 7.91291e-05
+Solved in 2674 iterations and 8.40 seconds (18.44 work units)
+Optimal objective  5.910127151e+11
 
-User-callback calls 73, time in user-callback 0.00 sec
+User-callback calls 2700, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201678 rows, 211558 columns and 2057618 nonzeros
+Optimize a model with 201693 rows, 211558 columns and 2211763 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -459,20 +454,19 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0   -1.6370089e+24   2.795291e+31   2.110126e-06      0s
-    4492    5.9131605e+11   4.557697e+01   0.000000e+00      5s
-    4775    5.9131614e+11   0.000000e+00   0.000000e+00      6s
+       0    5.9101272e+11   4.594555e-01   0.000000e+00      0s
+      15    5.9101272e+11   0.000000e+00   0.000000e+00      0s
 
-Solved in 4775 iterations and 6.24 seconds (18.67 work units)
-Optimal objective  5.913161390e+11
+Solved in 15 iterations and 0.22 seconds (0.41 work units)
+Optimal objective  5.910127219e+11
 
-User-callback calls 4807, time in user-callback 0.03 sec
+User-callback calls 43, time in user-callback 0.00 sec
 Gurobi Optimizer version 11.0.3 build v11.0.3rc0 (win64 - Windows 11+.0 (26200.2))
 
 CPU model: 12th Gen Intel(R) Core(TM) i7-1260P, instruction set [SSE2|AVX|AVX2]
 Thread count: 12 physical cores, 16 logical processors, using up to 16 threads
 
-Optimize a model with 201680 rows, 211558 columns and 2057628 nonzeros
+Optimize a model with 201695 rows, 211558 columns and 2211773 nonzeros
 Coefficient statistics:
   Matrix range     [5e-03, 8e+00]
   Objective range  [3e+02, 2e+09]
@@ -484,10 +478,10 @@ Warning: Model contains large objective coefficients
 LP warm-start: use basis
 
 Iteration    Objective       Primal Inf.    Dual Inf.      Time
-       0   -2.3401657e+23   2.000554e+31   1.305001e-06      0s
-       9    5.9131614e+11   0.000000e+00   0.000000e+00      0s
+       0    5.9101272e+11   3.880532e-02   0.000000e+00      0s
+       2    5.9101273e+11   0.000000e+00   0.000000e+00      0s
 
-Solved in 9 iterations and 0.29 seconds (0.40 work units)
-Optimal objective  5.913161424e+11
+Solved in 2 iterations and 0.15 seconds (0.11 work units)
+Optimal objective  5.910127256e+11
 
-User-callback calls 38, time in user-callback 0.00 sec
+User-callback calls 27, time in user-callback 0.00 sec

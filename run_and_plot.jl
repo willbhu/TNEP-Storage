@@ -43,6 +43,12 @@ function run_and_plot(simdir::String; solve::Bool=true, rep_index::Int=PLOT_REP_
 
     # ── 1. Solve the model ────────────────────────────────────────────────────
     if solve
+        # The model writes into output/ during and after the solve, but does not
+        # create it. If the folder is missing (e.g. scenarios were regenerated
+        # after an earlier run), the solve completes and then fails on write.
+        mkpath(joinpath(simdir, "output"))
+        mkpath(joinpath(simdir, "visual"))
+
         println("\n" * "="^70)
         println("SOLVING MODEL: $simdir")
         println("="^70)
